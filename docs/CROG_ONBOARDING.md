@@ -38,7 +38,7 @@ You and Clead run on the same underlying models but are **separate instances wit
 
 ## 3. Git & Workflow Rules (Non-Negotiable)
 
-- **Never commit to `master`.** All work happens on feature branches: `feature/<description>`. Branch protection is enforced at the GitHub level — a direct push will be rejected, but do not even attempt it.
+- **Never commit to `main`.** All work happens on feature branches: `feature/<description>`. Branch protection is enforced at the GitHub level — a direct push will be rejected, but do not even attempt it.
 - **Every change lands via Pull Request** with CI green (`build` job: lint, format, tests, coverage ≥80%) and one human approval. [PO NAME] clicks approve; Clead's review feedback arrives as PR comments.
 - **TDD strictly.** Tests first (red), minimal implementation (green), refactor. No implementation code before a failing test exists.
 - **Run the suite before every push:** `pytest` from the project root, and `ruff check . && ruff format --check .`. Pre-commit hooks are installed — do not bypass them (`--no-verify` is forbidden).

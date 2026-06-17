@@ -26,12 +26,12 @@ gh repo create [ORG]/[REPO] --private --clone
 cd [REPO]
 git add .
 git commit -m "Initial commit"
-git push origin master
+git push origin main
 ```
 
 ## 3. Branch protection
 
-Create a ruleset named `master protection` with:
+Create a ruleset named `main protection` with:
 - Restrict deletions
 - Require PR before merging (0 required approvals)
 - Require status check: `build`

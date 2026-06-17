@@ -9,7 +9,7 @@
 
 ## 1. Philosophy
 
-Automate everything that is mechanical and error-prone. Keep everything that requires judgment human. The goal is that a developer who clones the repo on a new machine can be fully productive within five minutes, that no code reaches `master` without passing tests, and that the overhead of doing things right is lower than the overhead of doing things wrong.
+Automate everything that is mechanical and error-prone. Keep everything that requires judgment human. The goal is that a developer who clones the repo on a new machine can be fully productive within five minutes, that no code reaches `main` without passing tests, and that the overhead of doing things right is lower than the overhead of doing things wrong.
 
 This infrastructure is proportional to a small, early-phase project. It is not over-engineered. Every tool in this document earns its place.
 
@@ -20,25 +20,25 @@ This infrastructure is proportional to a small, early-phase project. It is not o
 **Platform:** GitHub — repo is hosted under a GitHub Team organisation account (required for branch protection enforcement on private repos)
 **Branching model:** GitHub Flow — simple, appropriate for a small team
 
-- `master` is always deployable (runnable)
+- `main` is always deployable (runnable)
 - All work happens on short-lived feature branches
 - Branch naming: `feature/<short-description>` or `fix/<short-description>`
   - Examples: `feature/udp-listener`, `fix/multicast-join-error`
-- Merge to `master` via Pull Request only — **direct pushes to `master` are blocked by branch protection**
+- Merge to `main` via Pull Request only — **direct pushes to `main` are blocked by branch protection**
 - PRs require all CI checks to pass before merge — **enforced by branch protection**
 - Delete branch after merge
 
-**Branch protection (`master`):**
+**Branch protection (`main`):**
 
-A GitHub ruleset named `master protection` is active on `master`. The following rules are enforced at the GitHub level — not convention, not guidelines:
+A GitHub ruleset named `main protection` is active on `main`. The following rules are enforced at the GitHub level — not convention, not guidelines:
 
 | Rule | Effect |
 |---|---|
-| Restrict deletions | `master` cannot be deleted |
+| Restrict deletions | `main` cannot be deleted |
 | Require a pull request before merging (0 approvals) | No direct pushes; all changes via PR |
 | Require status checks to pass (`build` job) | CI must be green before merge |
-| Require branches to be up to date | PR branch must include latest `master` |
-| Block force pushes | History on `master` cannot be rewritten |
+| Require branches to be up to date | PR branch must include latest `main` |
+| Block force pushes | History on `main` cannot be rewritten |
 
 See `TEAM_STRUCTURE.md` section 5 for the full PR workflow and reviewer roles.
 
@@ -161,7 +161,7 @@ with patch("socket.socket", return_value=mock_sock):
 ## 6. Continuous Integration (CI)
 
 **Platform:** GitHub Actions
-**Trigger:** Every push to any branch; every Pull Request targeting `master`
+**Trigger:** Every push to any branch; every Pull Request targeting `main`
 
 **Workflow file location:** `.github/workflows/ci.yml`
 
@@ -326,7 +326,7 @@ At the end of each iteration that involves a significant technical finding or ex
 
 **Created by:** Tech Owner (Claude), based on raw data and observations.
 
-**Committed to:** `docs/` folder, on the feature branch for that iteration, merged to `master` with the rest of the iteration's work.
+**Committed to:** `docs/` folder, on the feature branch for that iteration, merged to `main` with the rest of the iteration's work.
 
 **Contents (minimum):**
 

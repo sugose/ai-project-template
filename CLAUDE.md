@@ -6,4 +6,4 @@ This file exists because Claude Code auto-loads `CLAUDE.md` from the project roo
 
 @docs/CROG_ONBOARDING.md
 
-Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never commit to `master`.
+Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never commit to `main`.

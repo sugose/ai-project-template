@@ -65,7 +65,7 @@ This file exists because Claude Code auto-loads `CLAUDE.md` from the project roo
 
 @docs/CROG_ONBOARDING.md
 
-Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never commit to `master`.
+Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never commit to `main`.
 ```
 
 2. **`docs/CROG_ONBOARDING.md`** — Crog's full onboarding. Language-agnostic core with language-specific code standards section appended. Include:
@@ -154,7 +154,7 @@ Create the following files with the contents Clead has generated:
 Then:
 git add .
 git commit -m "Initial commit: [PROJECT NAME] project setup"
-git push origin master
+git push origin main
 
 python -m venv .venv
 .venv\Scripts\activate  # or: source .venv/bin/activate on macOS
@@ -192,7 +192,7 @@ Create the following files with the contents Clead has generated:
 Then:
 git add .
 git commit -m "Initial commit: [PROJECT NAME] project setup"
-git push origin master
+git push origin main
 
 npm ci
 npx biome ci .
@@ -210,12 +210,12 @@ If no, ask: Is your repo private or public?
 - **Public repo:** Branch protection rulesets are enforced on all plans. Proceed with setup.
 - **Private repo on a personal account (free plan):** GitHub does not enforce branch protection rules on private repos on the free plan. You have two options:
   - **Upgrade to GitHub Team** ($4/user/month) — creates an organisation with enforcement on private repos. Recommended if you want the hard gate.
-  - **Skip enforcement for now** — the workflow still functions; CI runs on every push and Clead reviews every PR. The only difference is that a direct push to master is not blocked at the GitHub level. You rely on discipline rather than enforcement.
+  - **Skip enforcement for now** — the workflow still functions; CI runs on every push and Clead reviews every PR. The only difference is that a direct push to main is not blocked at the GitHub level. You rely on discipline rather than enforcement.
   - Which would you prefer?
 - **Private repo on a GitHub Team or Enterprise plan:** Proceed with setup.
 
 Once the user has decided, give the branch protection ruleset instructions:
-- Ruleset name: `master protection`
+- Ruleset name: `main protection`
 - Rules: restrict deletions, require PR (0 approvals), require `build` CI status check, require branch up to date before merge, block force pushes
 
 ---

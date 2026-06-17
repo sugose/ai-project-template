@@ -16,7 +16,7 @@ Priority key:
 - **[LATER]** — confirmed future work, not yet scheduled
 - **[IDEA]** — unvalidated concept, needs discussion before committing
 - **[BLOCKED]** — waiting on a dependency or decision
-- **[DONE]** — completed and merged to `master`
+- **[DONE]** — completed and merged to `main`
 
 ---
 

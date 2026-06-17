@@ -44,7 +44,7 @@ Clead cannot access GitHub, the file system, or the terminal directly. [PO NAME]
 | Post Clead's approval on a PR | GitHub UI — Approve PR (posted as comment since Clead has no GitHub account) |
 | Relay reviewer inline PR comments to Clead | Copy comment text from GitHub PR, paste into Clead's chat |
 | Merge an approved PR | GitHub UI — Merge Pull Request |
-| Pull latest master after merge | `git checkout master && git pull` |
+| Pull latest main after merge | `git checkout main && git pull` |
 
 Crog (Claude Code) has direct terminal and `gh` CLI access — Crog manages its own branches, commits, pushes, and PR creation without [PO NAME] as relay.
 
@@ -66,7 +66,7 @@ Crog (Claude Code) has direct terminal and `gh` CLI access — Crog manages its 
 - Produces code subject to Clead's review before merging
 - Follows TDD strictly: tests first (red), implementation (green), refactor
 - Raises concerns, suggests alternatives, and pushes back when warranted — see `docs/CROG_ONBOARDING.md`
-- Never commits directly to `master`; all work lands via Pull Request
+- Never commits directly to `main`; all work lands via Pull Request
 
 ---
 
@@ -107,19 +107,19 @@ Paste the contents of the generated `.txt` file as the first message in the new 
 
 ## 5. Code Review Process
 
-All work merges to `master` via Pull Request. Direct pushes to `master` are not permitted.
+All work merges to `main` via Pull Request. Direct pushes to `main` are not permitted.
 
 ### Branch Protection
 
-`master` is protected by a GitHub ruleset (enforced under the GitHub Team plan). The following rules are active:
+`main` is protected by a GitHub ruleset (enforced under the GitHub Team plan). The following rules are active:
 
 | Rule | Setting | Effect |
 |---|---|---|
-| Restrict deletions | On | `master` cannot be deleted |
+| Restrict deletions | On | `main` cannot be deleted |
 | Require a pull request before merging | On — 0 required approvals | All changes must go through a PR; no direct pushes |
 | Require status checks to pass | On — `build` job required | CI (lint, format, tests, coverage) must be green before merge |
-| Require branches to be up to date | On | PR branch must include latest `master` before it can pass CI and merge |
-| Block force pushes | On | History on `master` cannot be rewritten |
+| Require branches to be up to date | On | PR branch must include latest `main` before it can pass CI and merge |
+| Block force pushes | On | History on `main` cannot be rewritten |
 
 These rules are enforced at the GitHub level — not a convention, not a guideline. A PR that fails CI cannot be merged regardless of who is trying. CI is the hard gate; 0 formal approvals are required.
 
@@ -279,4 +279,4 @@ When working from a secondary machine (e.g., a laptop or field kit):
 
 ## 10. Summary
 
-[PO NAME] owns the product. Clead owns the architecture and quality. Crog owns the implementation. They work together on [PRIMARY MACHINE] — Clead in the browser, Crog in the terminal — with no cross-machine relay, no synchronisation overhead. GitHub is the shared memory. Git diffs are the language they all speak. CI on `master` is the hard gate — nothing merges without lint, format, tests, and coverage passing. Clead reviews every PR via pr_dump; Copi reviews on request; Crog merges on [PO NAME]'s explicit instruction.
+[PO NAME] owns the product. Clead owns the architecture and quality. Crog owns the implementation. They work together on [PRIMARY MACHINE] — Clead in the browser, Crog in the terminal — with no cross-machine relay, no synchronisation overhead. GitHub is the shared memory. Git diffs are the language they all speak. CI on `main` is the hard gate — nothing merges without lint, format, tests, and coverage passing. Clead reviews every PR via pr_dump; Copi reviews on request; Crog merges on [PO NAME]'s explicit instruction.

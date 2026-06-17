@@ -22,7 +22,7 @@ ruff format --check src/
 
 ## Non-Negotiable Rules
 
-- **Never commit to `master`** — work on `feature/<description>` branches, open PRs
+- **Never commit to `main`** — work on `feature/<description>` branches, open PRs
 - **TDD strictly** — write failing tests first, then implementation
 - **No hardcoded values** — everything configurable
 - **No direct `--no-verify` bypasses** — pre-commit hooks are enforced
