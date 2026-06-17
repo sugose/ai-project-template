@@ -14,6 +14,7 @@ Every language pack must contain exactly these files:
 | `vscode-extensions.json` | Recommended VS Code extensions |
 | `gitignore` | Language-specific `.gitignore` entries |
 | Language tooling files | e.g. `pyproject.toml` + `requirements.txt` for Python; `package.json` + `tsconfig.json` + `biome.json` for Node |
+| `test_placeholder.*` | Single always-passing test — keeps CI green on day one; deleted when first real test is written |
 
 ## How to add a new language pack
 

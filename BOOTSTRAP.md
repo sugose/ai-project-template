@@ -135,6 +135,7 @@ Create the following files with the contents Clead has generated:
 - .gitignore
 - src/__init__.py
 - src/tests/__init__.py
+- src/tests/test_placeholder.py
 
 Then:
 git add .
@@ -172,7 +173,7 @@ Create the following files with the contents Clead has generated:
 - .vscode/extensions.json
 - .gitignore
 - src/index.ts
-- src/tests/.gitkeep
+- src/placeholder.test.ts
 
 Then:
 git add .

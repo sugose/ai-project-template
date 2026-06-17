@@ -4,6 +4,9 @@ All notable changes to this template are documented here.
 
 ## [Unreleased]
 
+### Added
+- Placeholder test files in each language pack — keeps CI green from day one
+
 ### Planned
 - C# language pack (`languages/csharp/`) — dotnet test, dotnet format
 - Elixir language pack (`languages/elixir/`) — mix test, ExUnit, Credo
