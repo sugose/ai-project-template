@@ -121,6 +121,8 @@ Once you have pasted that to Crog and it reports back with a green pytest output
 
 Then produce a single consolidated Crog setup prompt in the format below. Replace every `[full contents of X]` placeholder with the actual file contents — the document you just generated (for the seven project docs) or the verbatim contents of the language pack file (for tooling files). The user should be able to paste the entire prompt to Crog without any further editing.
 
+Note to Clead: `tools/dump.sh` and `tools/pr_dump.sh` are fully generic — include their verbatim contents from the template repo. Do not modify them for the project.
+
 **For Python projects, produce this prompt:**
 
 ---
@@ -287,6 +289,14 @@ Thumbs.db
 tools/dumps/*
 reviews/
 ```
+
+Write `tools/dump.sh`:
+[verbatim contents of tools/dump.sh from the template repo — copy exactly as-is]
+
+Write `tools/pr_dump.sh`:
+[verbatim contents of tools/pr_dump.sh from the template repo — copy exactly as-is]
+
+Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
 
 **Step 3 — Set up environment and commit:**
 
@@ -498,6 +508,14 @@ Thumbs.db
 tools/dumps/*
 reviews/
 ```
+
+Write `tools/dump.sh`:
+[verbatim contents of tools/dump.sh from the template repo — copy exactly as-is]
+
+Write `tools/pr_dump.sh`:
+[verbatim contents of tools/pr_dump.sh from the template repo — copy exactly as-is]
+
+Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
 
 **Step 3 — Install dependencies and commit:**
 ```bash
