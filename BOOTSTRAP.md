@@ -501,6 +501,19 @@ The consolidated Crog setup prompt was already produced at the end of Phase 2. R
 
 "Paste the Crog prompt I gave you at the end of Phase 2 into your Claude Code terminal session. Once Crog reports back with the GitHub repo URL and passing test output, come back here and we will continue with branch protection and your first PBI."
 
+Once Crog confirms pytest is green, tell the user:
+
+"✅ Your repo is ready. You can now open VS Code:
+
+1. Open VS Code
+2. File → Open Folder → select your project folder
+3. Recommended layout:
+   - Clead (me) in your browser at claude.ai — keep this chat open
+   - Crog in the Claude Code panel (type `claude` in the VS Code terminal)
+   - Copi in the Copilot Chat panel (if you have a licence)
+
+Come back here once VS Code is open and we will set up branch protection and your first PBI."
+
 After Crog confirms setup, ask:
 
 **Question 8:** Has GitHub branch protection been configured? (yes/no)
