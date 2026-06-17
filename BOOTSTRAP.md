@@ -258,14 +258,27 @@ Open a PR when done. Run bash tools/pr_dump.sh <PR-number> after opening.
 
 Tell the user:
 
-"Your project is set up. Here is a summary:
+"✅ **Bootstrap complete.** Your project is fully set up.
 
+---
+
+**Summary:**
 - GitHub repo: [REPO PATH]
 - Language: [LANGUAGE]
-- Team: You ([PO NAME]) as Product Owner, me (Clead) as Tech Owner, Crog as Senior Developer[, Copi as Reviewer — if Copilot Business licence is available]
+- Team: You ([PO NAME]) as Product Owner, me (Clead) as Tech Owner, Crog as Senior Developer[, Copi as Reviewer if applicable]
 - CI: GitHub Actions running lint, format, tests, and coverage on every push
 - First PBI handed to Crog: [PBI-1.1 description]
 
-To start any future session, run `bash tools/dump.sh` from the project root and paste the output into a new Claude chat. I will pick up exactly where we left off.
+---
+
+**What to do next:**
+
+1. **Wait for Crog** to complete the first PBI and open a pull request
+2. **When Crog opens a PR**, run `bash tools/pr_dump.sh <PR-number>` from your project root in a terminal
+3. **Open a new Claude chat** at claude.ai, paste the output of `pr_dump.sh`, and I will review the PR
+4. **Merge** on my approval once CI is green
+
+**Starting future sessions:**
+Run `bash tools/dump.sh` from your project root and paste the output into a new Claude chat. I will pick up exactly where we left off.
 
 Good luck — let's build something."
