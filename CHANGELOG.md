@@ -2,6 +2,12 @@
 
 All notable changes to this template are documented here.
 
+## [Unreleased]
+
+### Planned
+- C# language pack (`languages/csharp/`) — dotnet test, dotnet format
+- Elixir language pack (`languages/elixir/`) — mix test, ExUnit, Credo
+
 ## [1.0.0] — 2026-06-17
 
 ### Added
