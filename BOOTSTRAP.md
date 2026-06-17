@@ -566,7 +566,11 @@ Store the answer and use it to tailor the generated `docs/TEAM_STRUCTURE.md` and
 
 The consolidated Crog setup prompt was already produced at the end of Phase 2. Remind the user:
 
-"Paste the Crog prompt I gave you at the end of Phase 2 into your Claude Code terminal session. Once Crog reports back with the GitHub repo URL and passing test output, come back here and we will continue with branch protection and your first PBI."
+"Paste the Crog prompt I gave you above into your Claude Code terminal session. Once Crog reports back with the GitHub repo URL and passing pytest output, come back here and we'll continue with branch protection and your first PBI.
+
+If you need the Crog prompt reposted without any surrounding text, just say **'repost Crog prompt'** and I will output it clean between the START and END markers so you can copy it directly."
+
+Note to Clead: if the user says "repost Crog prompt" or similar, output the consolidated Crog setup prompt again — nothing before the START marker, nothing after the END marker except a blank line. No preamble, no explanation.
 
 Once Crog confirms pytest is green, tell the user:
 
