@@ -566,7 +566,19 @@ Store the answer and use it to tailor the generated `docs/TEAM_STRUCTURE.md` and
 
 The consolidated Crog setup prompt was already produced at the end of Phase 2. Remind the user:
 
-"Paste the Crog prompt I gave you above into your Claude Code terminal session. Once Crog reports back with the GitHub repo URL and passing pytest output, come back here and we'll continue with branch protection and your first PBI.
+"Before pasting the Crog prompt, here is how to start a Claude Code session if this is your first time:
+
+1. Open a terminal — PowerShell on Windows, Terminal on macOS
+2. Navigate to the folder where you want your project to live:
+   - Windows: `cd C:\Users\yourname\Projects`
+   - macOS: `cd ~/Projects`
+3. Type `claude` and press Enter
+4. Claude Code will open — you may be asked to authenticate via browser on first run, follow the prompts
+5. Once you see the `>` prompt, Claude Code is ready
+6. Paste the Crog prompt between the START and END markers and press Enter
+7. When Claude Code asks for approval on tool calls, approve them — you can enable auto-approve after the first one to speed things up
+
+Paste the Crog prompt I gave you above into your Claude Code session. Once Crog reports back with the GitHub repo URL and passing pytest output, come back here and we'll continue with branch protection and your first PBI.
 
 If you need the Crog prompt reposted without any surrounding text, just say **'repost Crog prompt'** and I will output it clean between the START and END markers so you can copy it directly."
 
