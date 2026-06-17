@@ -8,6 +8,51 @@ Click the **Use this template** button at the top of this repo on GitHub to crea
 
 Then open `BOOTSTRAP.md` in your new repo, copy everything below the divider line, and paste it into a fresh Claude chat. Clead will walk you through the rest.
 
+---
+
+## The AI Team
+
+This template is built around three AI agents working together with a human Product Owner. Each has a distinct role, a distinct tool, and a distinct place in the workflow. Together they cover the full development lifecycle — from architecture to implementation to review — without any of them needing to do everything.
+
+### Clead — Tech Owner
+**Tool:** Claude (chat interface at claude.ai)
+
+Clead is the architect. It owns the technical direction of the project: designing the system, writing the specification, reviewing every pull request, and making the final call on all technical decisions. Clead never writes directly to the repo — it works through the chat interface, with the Product Owner acting as its hands in GitHub.
+
+Clead reviews every PR via a tool called `pr_dump.sh`, which bundles the full diff and source context into a single file that gets pasted into the chat. Clead's review follows a five-point standard: threat model, TPS compliance, error handling pass, test quality check, and an explicit list of what was not checked.
+
+At the start of every session, the Product Owner runs `tools/dump.sh` and pastes the output into a fresh Claude chat. Clead reads the full repo state and picks up exactly where the last session left off.
+
+### Crog — Senior Developer
+**Tool:** Claude Code (CLI, runs in the terminal)
+
+Crog is the implementer. It works directly in the repo — creating branches, writing tests, writing code, committing, pushing, and opening pull requests autonomously via the `gh` CLI. The Product Owner sets the task; Crog executes it without needing to be walked through every command.
+
+Crog follows TDD strictly: tests first (red), then implementation (green), then refactor. It never commits directly to `master`. Every piece of work lands via a pull request that Clead reviews.
+
+Crog is not a passive code generator. It raises concerns, flags spec gaps, pushes back on unnecessary complexity, and surfaces alternatives. It speaks up when something is worth raising and implements cleanly when it is not.
+
+### Copi — Code Reviewer
+**Tool:** GitHub Copilot Business (VS Code + native GitHub PR integration)
+
+Copi is the reviewer. It reads full file context — not just diffs — which means it catches cross-section inconsistencies that Clead, reviewing from a diff only, can miss. Copi reviews pull requests directly in GitHub via the native Copilot code review integration.
+
+Copi is a standard reviewer on all significant code PRs. Its review is complementary to Clead's: where Clead checks architectural alignment and spec compliance, Copi checks implementation correctness, type safety, and edge cases.
+
+---
+
+## Why This Workflow Works
+
+Each agent has a structural advantage the others lack:
+
+- **Clead** has the full project context in its chat window and the spec in its head. It catches architectural drift and spec deviations.
+- **Crog** has direct repo access and terminal execution. It moves fast, catches nothing from the diff that Clead doesn't, but finds real implementation bugs through test execution.
+- **Copi** reads full files. It finds bugs that only appear when you see a function and its callers together.
+
+No single agent catches everything. The three-layer review catches most things. The Product Owner — a human with domain knowledge and final authority — catches the rest.
+
+---
+
 ## Supported Languages
 
 | Language | Test framework | Linter/Formatter |
@@ -15,35 +60,7 @@ Then open `BOOTSTRAP.md` in your new repo, copy everything below the divider lin
 | Python 3.14.5 | pytest | Ruff |
 | Node/TypeScript 22 | Jest + ts-jest | Biome |
 
-## What This Is
-
-This template packages a proven AI-assisted development workflow for software projects. It includes all tooling, documentation templates, and AI agent onboarding needed to start building immediately.
-
-The workflow uses three AI agents with distinct roles:
-
-| Agent | Tool | Role |
-|---|---|---|
-| Clead | Claude (chat) | Tech Owner — architecture, specs, PR review |
-| Crog | Claude Code (CLI) | Senior Developer — TDD implementation, autonomous git/PR |
-| Copi | GitHub Copilot Business | Code Reviewer — PR review via GitHub integration |
-
-## Getting Started
-
-**The fastest way to set up a new project from this template:**
-
-1. Open a fresh Claude chat at [claude.ai](https://claude.ai)
-2. Open `BOOTSTRAP.md` in this repo
-3. Copy everything below the divider line and paste it into the chat
-4. Follow Clead's questions — your project will be fully set up by the end
-
-The bootstrap wizard will walk you through:
-- Choosing your language (Python or Node/TypeScript)
-- Collecting your project details
-- Generating all project documentation with your specifics filled in
-- Setting up the GitHub repo via Crog
-- Configuring branch protection
-- Writing your first technical spec
-- Handing your first task to Crog
+---
 
 ## What Is Included
 
@@ -51,23 +68,24 @@ The bootstrap wizard will walk you through:
 |---|---|
 | `BOOTSTRAP.md` | Paste-and-go setup wizard prompt for Claude |
 | `CLAUDE.md` | Crog auto-load entry point |
-| `languages/python/` | Python-specific CI, tooling, and code standards |
-| `languages/node/` | Node/TypeScript-specific CI, tooling, and code standards |
-| `.github/copilot-instructions.md` | Copi onboarding template |
-| `docs/CROG_ONBOARDING.md` | Crog's full mandate and workflow rules |
+| `.github/copilot-instructions.md` | Copi onboarding |
+| `docs/CROG_ONBOARDING.md` | Crog's full mandate, workflow rules, code standards |
 | `docs/TEAM_STRUCTURE.md` | Team roles, PR workflow, Clead Review Standard |
 | `docs/DEV_INFRASTRUCTURE.md` | CI/CD, tooling, runbook |
 | `docs/PRODUCT_BACKLOG.md` | Backlog template |
+| `languages/python/` | Python-specific CI, tooling config, code standards |
+| `languages/node/` | Node/TypeScript-specific CI, tooling config, code standards |
 | `tools/dump.sh` | Repo dump for Clead session catch-up |
 | `tools/pr_dump.sh` | PR review bundle for Clead |
 
+---
+
 ## Prerequisites
 
-- Node.js (for Claude Code CLI)
-- Claude Pro subscription (covers both Clead and Crog)
+- A Claude Pro subscription (covers both Clead and Crog)
 - GitHub Copilot Business licence
-- Git + GitHub CLI (`gh`)
-- For Python projects: Python 3.14.5
-- For Node projects: Node.js 22 LTS
+- Node.js (for Claude Code CLI: `npm install -g @anthropic-ai/claude-code`)
+- Git + GitHub CLI (`gh auth login`)
+- Python 3.14.5 or Node.js 22 depending on your chosen language
 
-See `SETUP.md` for the manual setup checklist if you prefer not to use the bootstrap wizard.
+See `SETUP.md` for the manual setup checklist, or use `BOOTSTRAP.md` for the guided wizard.
