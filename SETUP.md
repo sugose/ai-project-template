@@ -2,6 +2,14 @@
 
 Use this if you prefer to set up manually rather than using the bootstrap wizard in `BOOTSTRAP.md`.
 
+## 0. Choose your language
+
+This template supports:
+- **Python** — uses pytest, Ruff, pip, pre-commit
+- **Node/TypeScript** — uses Jest, Biome, npm
+
+Copy the relevant files from `languages/python/` or `languages/node/` into your project root during setup.
+
 ## 1. Replace placeholders
 
 Search and replace across all files:
@@ -34,6 +42,7 @@ Note: enforcement on private repos requires a GitHub Team organisation. Free pla
 
 ## 4. Local environment
 
+**Python:**
 ```bash
 python -m venv .venv
 source .venv/bin/activate        # macOS
@@ -42,6 +51,13 @@ pip install -r requirements.txt -r requirements-dev.txt
 pre-commit install
 pytest
 ruff check src/
+```
+
+**Node/TypeScript:**
+```bash
+npm ci
+npx biome ci .
+npx jest
 ```
 
 ## 5. AI team

@@ -1,10 +1,17 @@
-# ai-python-project-template
+# ai-project-template
 
-A template for AI-assisted Python projects using the Clead + Crog + Copi workflow.
+A template for AI-assisted software projects using the Clead + Crog + Copi workflow.
+
+## Supported Languages
+
+| Language | Test framework | Linter/Formatter |
+|---|---|---|
+| Python 3.14.5 | pytest | Ruff |
+| Node/TypeScript 22 | Jest + ts-jest | Biome |
 
 ## What This Is
 
-This template packages a proven AI-assisted development workflow for Python projects. It includes all tooling, documentation templates, and AI agent onboarding needed to start building immediately.
+This template packages a proven AI-assisted development workflow for software projects. It includes all tooling, documentation templates, and AI agent onboarding needed to start building immediately.
 
 The workflow uses three AI agents with distinct roles:
 
@@ -24,6 +31,7 @@ The workflow uses three AI agents with distinct roles:
 4. Follow Clead's questions — your project will be fully set up by the end
 
 The bootstrap wizard will walk you through:
+- Choosing your language (Python or Node/TypeScript)
 - Collecting your project details
 - Generating all project documentation with your specifics filled in
 - Setting up the GitHub repo via Crog
@@ -37,26 +45,23 @@ The bootstrap wizard will walk you through:
 |---|---|
 | `BOOTSTRAP.md` | Paste-and-go setup wizard prompt for Claude |
 | `CLAUDE.md` | Crog auto-load entry point |
-| `.github/workflows/ci.yml` | CI: lint, format, test, coverage ≥80% |
-| `.github/copilot-instructions.md` | Copi onboarding |
+| `languages/python/` | Python-specific CI, tooling, and code standards |
+| `languages/node/` | Node/TypeScript-specific CI, tooling, and code standards |
+| `.github/copilot-instructions.md` | Copi onboarding template |
 | `docs/CROG_ONBOARDING.md` | Crog's full mandate and workflow rules |
 | `docs/TEAM_STRUCTURE.md` | Team roles, PR workflow, Clead Review Standard |
 | `docs/DEV_INFRASTRUCTURE.md` | CI/CD, tooling, runbook |
 | `docs/PRODUCT_BACKLOG.md` | Backlog template |
 | `tools/dump.sh` | Repo dump for Clead session catch-up |
 | `tools/pr_dump.sh` | PR review bundle for Clead |
-| `pyproject.toml` | Ruff + pytest config |
-| `requirements.txt` | Pinned runtime dependencies |
-| `requirements-dev.txt` | Pinned dev dependencies |
-| `.pre-commit-config.yaml` | Ruff pre-commit hooks |
-| `.vscode/` | Shared editor settings |
 
 ## Prerequisites
 
-- Python 3.14.5
 - Node.js (for Claude Code CLI)
 - Claude Pro subscription (covers both Clead and Crog)
 - GitHub Copilot Business licence
 - Git + GitHub CLI (`gh`)
+- For Python projects: Python 3.14.5
+- For Node projects: Node.js 22 LTS
 
 See `SETUP.md` for the manual setup checklist if you prefer not to use the bootstrap wizard.

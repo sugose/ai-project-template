@@ -1,9 +1,4 @@
-__pycache__/
-*.pyc
-.venv/
-.coverage
-*.log
-.DS_Store
-Thumbs.db
 tools/dumps/*
 reviews/
+.DS_Store
+Thumbs.db
