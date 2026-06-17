@@ -97,7 +97,13 @@ Ask:
 
 **Question 6:** Is Claude Code CLI already installed? (yes/no)
 
-If no: `npm install -g @anthropic-ai/claude-code` — come back when done.
+To check, ask the user to open a terminal and run:
+```bash
+claude --version
+```
+If it returns a version number, it is installed. If it says "command not found" or similar, it is not.
+
+If not installed: tell them to run `npm install -g @anthropic-ai/claude-code`, then run `claude --version` again to confirm, and come back once it is done.
 
 If yes, ask:
 
@@ -109,7 +115,15 @@ If no: tell the user the workflow works without Copi — Clead will carry the fu
 
 Store the answer and use it to tailor the generated `docs/TEAM_STRUCTURE.md` and `docs/CROG_ONBOARDING.md` — if Copi is not available, mark it as absent in the team table rather than listing it as an active reviewer.
 
-Then produce the following **Crog setup prompt**, tailored to the chosen language:
+Once you have confirmed Claude Code is installed, produce the Crog setup prompt below and give the user these instructions for running it:
+
+1. Open a terminal (PowerShell on Windows, Terminal on macOS)
+2. Navigate to where you want your project to live: `cd path/to/your/projects/folder`
+3. Type `claude` and press Enter — this opens a Claude Code session
+4. Paste the prompt below into the Claude Code chat and press Enter
+5. When Claude Code asks for approval on tool calls, approve them — most can be auto-approved after the first
+
+---
 
 **For Python:**
 ```
