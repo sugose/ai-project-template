@@ -103,9 +103,19 @@ All notable changes to [PROJECT NAME] are documented here.
 
 7. **`.github/copilot-instructions.md`** — Copi onboarding. Adapt commands and standards for chosen language.
 
-After generating all seven documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the triple dashes and paste it into your Claude Code terminal session."
+After generating all seven documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the START and END markers below and paste it into your Claude Code terminal session."
 
-Then produce a single consolidated Crog setup prompt in the format below. Replace every `[full contents of X]` placeholder with the actual file contents — the document you just generated (for the six project docs) or the verbatim contents of the language pack file (for tooling files). The user should be able to paste the entire prompt to Crog without any further editing.
+Note to Clead: wrap the consolidated Crog prompt with these exact markers:
+
+```
+=== CROG PROMPT START ===
+
+[prompt contents here]
+
+=== CROG PROMPT END ===
+```
+
+Then produce a single consolidated Crog setup prompt in the format below. Replace every `[full contents of X]` placeholder with the actual file contents — the document you just generated (for the seven project docs) or the verbatim contents of the language pack file (for tooling files). The user should be able to paste the entire prompt to Crog without any further editing.
 
 **For Python projects, produce this prompt:**
 
