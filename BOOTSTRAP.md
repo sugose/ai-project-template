@@ -123,7 +123,38 @@ You are the Senior Developer. Your job is to:
 
    - Vocabulary (placeholder table)
 
-3. **`docs/TEAM_STRUCTURE.md`** — Full team structure and PR workflow. Keep Clead Review Standard (all 5 points), PR directions A/B/C, branch protection table, and day-to-day workflow verbatim.
+3. **`docs/TEAM_STRUCTURE.md`** — Full team structure and PR workflow. Keep Clead Review Standard (all 5 points), branch protection table, and day-to-day workflow verbatim. PR directions must follow this exact sequence:
+
+**A — Feature PR (Crog → main)**
+1. Crog opens PR from `feature/<name>` to `main`.
+2. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+3. Crog waits for Copi review to complete.
+4. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
+5. Clead reviews in Claude chat.
+6. [PO NAME] merges once CI is green and Clead approves.
+
+**B — Fix PR (Crog → main)**
+1. Crog opens PR from `fix/<name>` to `main`.
+2. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+3. Crog waits for Copi review to complete.
+4. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
+5. Clead reviews in Claude chat.
+6. [PO NAME] merges once CI is green and Clead approves.
+
+**C — Spec/Docs PR (Clead → main)**
+1. Clead produces updated doc content.
+2. Crog writes the file to disk, commits, and opens a PR.
+3. Skip Copi — docs-only PR.
+4. Crog runs `bash tools/pr_dump.sh <PR-number>` immediately and reports to Clead.
+5. [PO NAME] reviews and merges directly.
+
+Day-to-day workflow:
+1. [PO NAME] picks the next PBI from `docs/PRODUCT_BACKLOG.md`.
+2. [PO NAME] pastes the Crog task prompt into Claude Code.
+3. Crog implements, opens a PR, requests Copi review (code PRs only), waits for Copi to complete, runs `pr_dump.sh`, and reports back.
+4. Clead reviews in Claude chat.
+5. [PO NAME] merges on Clead's approval.
+6. [PO NAME] updates `CHANGELOG.md` and moves to the next PBI.
 
 4. **`docs/DEV_INFRASTRUCTURE.md`** — CI/CD, tooling, environment setup. Adapt tooling sections for chosen language (Python: pip/venv/Ruff/pytest; Node: npm/Biome/Jest).
 
@@ -871,8 +902,8 @@ Tell the user:
 **What to do next:**
 
 1. **Wait for Crog** to complete the first PBI and open a pull request
-2. **When Crog opens a PR**, run `bash tools/pr_dump.sh <PR-number>` from your project root in a terminal
-3. **Open a new Claude chat** at claude.ai, paste the output of `pr_dump.sh`, and I will review the PR
+2. **Crog will automatically** request a Copi review (for code PRs), wait for it to complete, then run `pr_dump.sh` and report back
+3. **Paste Crog's pr_dump output** into this chat and I will review the PR
 4. **Merge** on my approval once CI is green
 
 **Starting future sessions:**
