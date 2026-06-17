@@ -556,7 +556,7 @@ If not installed: tell them to run `npm install -g @anthropic-ai/claude-code`, t
 
 If yes, ask:
 
-**Question 7:** Do you have a GitHub Copilot Business licence? (yes/no)
+**Question 7:** Do you have a GitHub Copilot Business licence that you want to use as an optional code reviewer? (yes/no)
 
 If yes: tell the user to install the GitHub Copilot extension in VS Code if not already installed, and confirm it is active. Tell them Copi will be set up as a standard reviewer on all significant code PRs.
 
