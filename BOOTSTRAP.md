@@ -87,7 +87,389 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 
 6. **`.github/copilot-instructions.md`** — Copi onboarding. Adapt commands and standards for chosen language.
 
-After all six documents, tell the user: "All project documents are ready. Next I will give you the commands to set up the repo."
+After generating all six documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the triple dashes and paste it into your Claude Code terminal session."
+
+Then produce a single consolidated Crog setup prompt in the format below. Replace every `[full contents of X]` placeholder with the actual file contents — the document you just generated (for the six project docs) or the verbatim contents of the language pack file (for tooling files). The user should be able to paste the entire prompt to Crog without any further editing.
+
+**For Python projects, produce this prompt:**
+
+---
+Crog — task: initialise [PROJECT NAME] repo
+
+**Step 1 — Create the GitHub repo and clone it:**
+```bash
+gh repo create [REPO PATH] --private --clone
+cd [REPO NAME]
+```
+
+**Step 2 — Write all project files:**
+
+Write `CLAUDE.md`:
+[full contents of generated CLAUDE.md]
+
+Write `docs/CROG_ONBOARDING.md`:
+[full contents of generated CROG_ONBOARDING.md]
+
+Write `docs/TEAM_STRUCTURE.md`:
+[full contents of generated TEAM_STRUCTURE.md]
+
+Write `docs/DEV_INFRASTRUCTURE.md`:
+[full contents of generated DEV_INFRASTRUCTURE.md]
+
+Write `docs/PRODUCT_BACKLOG.md`:
+[full contents of generated PRODUCT_BACKLOG.md]
+
+Write `.github/copilot-instructions.md`:
+[full contents of generated copilot-instructions.md]
+
+Write `src/__init__.py` — empty file.
+Write `src/tests/__init__.py` — empty file.
+
+Write `src/tests/test_placeholder.py`:
+```python
+"""
+Placeholder test — keeps CI green on a fresh project.
+Delete this file when you write your first real test.
+"""
+
+
+def test_placeholder_always_passes():
+    """This test exists so CI passes before any real code is written.
+    Replace it with your first real test from your first PBI."""
+    assert True
+```
+
+Write `pyproject.toml`:
+```toml
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+```
+
+Write `requirements.txt`:
+```
+pytest==8.3.5
+pytest-cov==6.1.0
+pyyaml==6.0.2
+```
+
+Write `requirements-dev.txt`:
+```
+# Development-only dependencies
+# Not required to run the application — only needed for linting, formatting, and pre-commit hooks.
+
+ruff==0.9.10
+pre-commit==4.2.0
+```
+
+Write `.pre-commit-config.yaml`:
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+```
+
+Write `.github/workflows/ci.yml`:
+```yaml
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14.5"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check src/
+
+      - name: Format check
+        run: ruff format --check src/
+
+      - name: Test with coverage
+        run: pytest --cov=src --cov-fail-under=80
+```
+
+Write `.vscode/settings.json`:
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "charliermarsh.ruff",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "src/tests"
+  ]
+}
+```
+
+Write `.vscode/extensions.json`:
+```json
+{
+  "recommendations": [
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "github.copilot"
+  ]
+}
+```
+
+Write `.gitignore`:
+```
+__pycache__/
+*.pyc
+.venv/
+.coverage
+*.log
+.DS_Store
+Thumbs.db
+tools/dumps/*
+reviews/
+```
+
+**Step 3 — Set up environment and commit:**
+```bash
+git add .
+git commit -m "Initial commit: [PROJECT NAME] project setup"
+git push origin main
+
+python -m venv .venv
+source .venv/bin/activate  # macOS
+# or: .venv\Scripts\activate  # Windows
+pip install -r requirements.txt -r requirements-dev.txt
+pre-commit install
+pytest
+```
+
+Report back with the GitHub repo URL and pytest output.
+
+---
+
+**For Node/TypeScript projects, produce this prompt instead:**
+
+---
+Crog — task: initialise [PROJECT NAME] repo
+
+**Step 1 — Create the GitHub repo and clone it:**
+```bash
+gh repo create [REPO PATH] --private --clone
+cd [REPO NAME]
+```
+
+**Step 2 — Write all project files:**
+
+Write `CLAUDE.md`:
+[full contents of generated CLAUDE.md]
+
+Write `docs/CROG_ONBOARDING.md`:
+[full contents of generated CROG_ONBOARDING.md]
+
+Write `docs/TEAM_STRUCTURE.md`:
+[full contents of generated TEAM_STRUCTURE.md]
+
+Write `docs/DEV_INFRASTRUCTURE.md`:
+[full contents of generated DEV_INFRASTRUCTURE.md]
+
+Write `docs/PRODUCT_BACKLOG.md`:
+[full contents of generated PRODUCT_BACKLOG.md]
+
+Write `.github/copilot-instructions.md`:
+[full contents of generated copilot-instructions.md]
+
+Write `src/index.ts` — empty file (placeholder for first module).
+
+Write `src/placeholder.test.ts`:
+```typescript
+/**
+ * Placeholder test — keeps CI green on a fresh project.
+ * Delete this file when you write your first real test.
+ */
+
+describe('placeholder', () => {
+  it('always passes until replaced by real tests', () => {
+    expect(true).toBe(true);
+  });
+});
+```
+
+Write `package.json`:
+```json
+{
+  "name": "[project-name]",
+  "version": "0.1.0",
+  "description": "[project-description]",
+  "scripts": {
+    "test": "jest --coverage",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "ci": "biome ci . && jest --coverage --coverageThreshold='{\"global\":{\"lines\":80}}'"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "jest": "29.7.0",
+    "@types/jest": "29.5.14",
+    "ts-jest": "29.2.5",
+    "typescript": "5.7.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": ["src/**/*.ts", "!src/**/*.test.ts"]
+  }
+}
+```
+
+Write `tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+Write `biome.json`:
+```json
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  }
+}
+```
+
+Write `.github/workflows/ci.yml`:
+```yaml
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and format check
+        run: npx biome ci .
+
+      - name: Test with coverage
+        run: npx jest --coverage --coverageThreshold='{"global":{"lines":80}}'
+```
+
+Write `.vscode/settings.json`:
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "biomejs.biome",
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative"
+}
+```
+
+Write `.vscode/extensions.json`:
+```json
+{
+  "recommendations": [
+    "biomejs.biome",
+    "ms-vscode.vscode-typescript-next",
+    "github.copilot"
+  ]
+}
+```
+
+Write `.gitignore`:
+```
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+tools/dumps/*
+reviews/
+```
+
+**Step 3 — Install dependencies and commit:**
+```bash
+git add .
+git commit -m "Initial commit: [PROJECT NAME] project setup"
+git push origin main
+
+npm ci
+npx biome ci .
+npx jest
+```
+
+Report back with the GitHub repo URL and test output.
 
 ---
 
@@ -115,91 +497,9 @@ If no: tell the user the workflow works without Copi — Clead will carry the fu
 
 Store the answer and use it to tailor the generated `docs/TEAM_STRUCTURE.md` and `docs/CROG_ONBOARDING.md` — if Copi is not available, mark it as absent in the team table rather than listing it as an active reviewer.
 
-Once you have confirmed Claude Code is installed, produce the Crog setup prompt below and give the user these instructions for running it:
+The consolidated Crog setup prompt was already produced at the end of Phase 2. Remind the user:
 
-1. Open a terminal (PowerShell on Windows, Terminal on macOS)
-2. Navigate to where you want your project to live: `cd path/to/your/projects/folder`
-3. Type `claude` and press Enter — this opens a Claude Code session
-4. Paste the prompt below into the Claude Code chat and press Enter
-5. When Claude Code asks for approval on tool calls, approve them — most can be auto-approved after the first
-
----
-
-**For Python:**
-```
-Crog — task: initialise [PROJECT NAME] repo
-
-gh repo create [REPO PATH] --private --clone
-cd [REPO NAME]
-
-Create the following files with the contents Clead has generated:
-- CLAUDE.md
-- docs/CROG_ONBOARDING.md
-- docs/TEAM_STRUCTURE.md
-- docs/DEV_INFRASTRUCTURE.md
-- docs/PRODUCT_BACKLOG.md
-- .github/workflows/ci.yml
-- .github/copilot-instructions.md
-- pyproject.toml
-- requirements.txt
-- requirements-dev.txt
-- .pre-commit-config.yaml
-- .vscode/settings.json
-- .vscode/extensions.json
-- .gitignore
-- src/__init__.py
-- src/tests/__init__.py
-- src/tests/test_placeholder.py
-
-Then:
-git add .
-git commit -m "Initial commit: [PROJECT NAME] project setup"
-git push origin main
-
-python -m venv .venv
-.venv\Scripts\activate  # or: source .venv/bin/activate on macOS
-pip install -r requirements.txt -r requirements-dev.txt
-pre-commit install
-pytest
-
-Report back with the GitHub repo URL and pytest output.
-```
-
-**For Node/TypeScript:**
-```
-Crog — task: initialise [PROJECT NAME] repo
-
-gh repo create [REPO PATH] --private --clone
-cd [REPO NAME]
-
-Create the following files with the contents Clead has generated:
-- CLAUDE.md
-- docs/CROG_ONBOARDING.md
-- docs/TEAM_STRUCTURE.md
-- docs/DEV_INFRASTRUCTURE.md
-- docs/PRODUCT_BACKLOG.md
-- .github/workflows/ci.yml
-- .github/copilot-instructions.md
-- package.json
-- tsconfig.json
-- biome.json
-- .vscode/settings.json
-- .vscode/extensions.json
-- .gitignore
-- src/index.ts
-- src/placeholder.test.ts
-
-Then:
-git add .
-git commit -m "Initial commit: [PROJECT NAME] project setup"
-git push origin main
-
-npm ci
-npx biome ci .
-npx jest
-
-Report back with the GitHub repo URL and test output.
-```
+"Paste the Crog prompt I gave you at the end of Phase 2 into your Claude Code terminal session. Once Crog reports back with the GitHub repo URL and passing test output, come back here and we will continue with branch protection and your first PBI."
 
 After Crog confirms setup, ask:
 
