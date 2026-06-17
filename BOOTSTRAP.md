@@ -101,11 +101,15 @@ If no: `npm install -g @anthropic-ai/claude-code` — come back when done.
 
 If yes, ask:
 
-**Question 7:** Is GitHub Copilot Business active in VS Code? (yes/no)
+**Question 7:** Do you have a GitHub Copilot Business licence? (yes/no)
 
-If no: install the extension and activate the licence, then come back.
+If yes: tell the user to install the GitHub Copilot extension in VS Code if not already installed, and confirm it is active. Tell them Copi will be set up as a standard reviewer on all significant code PRs.
 
-If yes, produce the following **Crog setup prompt**, tailored to the chosen language:
+If no: tell the user the workflow works without Copi — Clead will carry the full review load. They can add Copi later if they get a licence. Continue without it.
+
+Store the answer and use it to tailor the generated `docs/TEAM_STRUCTURE.md` and `docs/CROG_ONBOARDING.md` — if Copi is not available, mark it as absent in the team table rather than listing it as an active reviewer.
+
+Then produce the following **Crog setup prompt**, tailored to the chosen language:
 
 **For Python:**
 ```
@@ -239,7 +243,7 @@ Tell the user:
 
 - GitHub repo: [REPO PATH]
 - Language: [LANGUAGE]
-- Team: You ([PO NAME]) as Product Owner, me (Clead) as Tech Owner, Crog as Senior Developer, Copi as Reviewer
+- Team: You ([PO NAME]) as Product Owner, me (Clead) as Tech Owner, Crog as Senior Developer[, Copi as Reviewer — if Copilot Business licence is available]
 - CI: GitHub Actions running lint, format, tests, and coverage on every push
 - First PBI handed to Crog: [PBI-1.1 description]
 

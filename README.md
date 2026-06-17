@@ -32,12 +32,12 @@ Crog follows TDD strictly: tests first (red), then implementation (green), then 
 
 Crog is not a passive code generator. It raises concerns, flags spec gaps, pushes back on unnecessary complexity, and surfaces alternatives. It speaks up when something is worth raising and implements cleanly when it is not.
 
-### Copi — Code Reviewer
+### Copi — Code Reviewer (optional)
 **Tool:** GitHub Copilot Business (VS Code + native GitHub PR integration)
 
-Copi is the reviewer. It reads full file context — not just diffs — which means it catches cross-section inconsistencies that Clead, reviewing from a diff only, can miss. Copi reviews pull requests directly in GitHub via the native Copilot code review integration.
+Copi is an optional but recommended addition to the team. It reads full file context — not just diffs — which means it catches cross-section inconsistencies that Clead, reviewing from a diff only, can miss. Copi reviews pull requests directly in GitHub via the native Copilot code review integration.
 
-Copi is a standard reviewer on all significant code PRs. Its review is complementary to Clead's: where Clead checks architectural alignment and spec compliance, Copi checks implementation correctness, type safety, and edge cases.
+If you have a GitHub Copilot Business licence, add Copi as a standard reviewer on all significant code PRs. If not, Clead carries the full review load — the workflow functions without Copi, but the three-layer review catches more than two.
 
 ---
 
@@ -47,7 +47,7 @@ Each agent has a structural advantage the others lack:
 
 - **Clead** has the full project context in its chat window and the spec in its head. It catches architectural drift and spec deviations.
 - **Crog** has direct repo access and terminal execution. It moves fast, catches nothing from the diff that Clead doesn't, but finds real implementation bugs through test execution.
-- **Copi** reads full files. It finds bugs that only appear when you see a function and its callers together.
+- **Copi** (optional) reads full files. It finds bugs that only appear when you see a function and its callers together. Without Copi, run `pr_dump.sh` with the `--no-src` flag disabled to give Clead the fullest possible context.
 
 No single agent catches everything. The three-layer review catches most things. The Product Owner — a human with domain knowledge and final authority — catches the rest.
 
@@ -82,10 +82,13 @@ No single agent catches everything. The three-layer review catches most things. 
 
 ## Prerequisites
 
+**Required:**
 - A Claude Pro subscription (covers both Clead and Crog)
-- GitHub Copilot Business licence
 - Node.js (for Claude Code CLI: `npm install -g @anthropic-ai/claude-code`)
 - Git + GitHub CLI (`gh auth login`)
 - Python 3.14.5 or Node.js 22 depending on your chosen language
+
+**Optional but recommended:**
+- GitHub Copilot Business licence — adds Copi as a second code reviewer with full-file context
 
 See `SETUP.md` for the manual setup checklist, or use `BOOTSTRAP.md` for the guided wizard.

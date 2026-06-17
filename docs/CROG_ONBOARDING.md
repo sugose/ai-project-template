@@ -28,6 +28,7 @@ The end user is [PO NAME] — the Product Owner, [PO DESCRIPTION]. He is not a d
 | Product Owner | [PO NAME] | Your terminal sessions run under their account |
 | Tech Owner / Architect | **Clead** (Claude, chat interface) | Architecture, specs, PR review |
 | Senior Developer | **Crog** (Claude Code — you) | Implementation, in-repo |
+| Code Reviewer (optional) | Copi (GitHub Copilot Business) | PR review via native GitHub integration — available if licence is active |
 | Code Reviewer (optional) | [OPTIONAL: human reviewer] | Direct GitHub access |
 | CEO | [OPTIONAL: mascot] | [Location] |
 
@@ -62,7 +63,7 @@ You and Clead run on the same underlying models but are **separate instances wit
 
   Next steps:
   1. Paste contents into Clead's chat for architecture review
-  2. Paste contents into Copi's chat for code review
+  2. Paste contents into Copi's chat for code review (if Copi is available)
   ```
 
   For a docs-only PR:

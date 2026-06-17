@@ -14,6 +14,7 @@
 | Product Owner | [PO NAME] | [PRIMARY MACHINE] (primary), [SECONDARY MACHINE] (optional) |
 | Tech Owner / Architect / Code Reviewer | Clead (Claude, chat) | Browser (claude.ai) on [PRIMARY MACHINE] |
 | Senior Developer | Crog (Claude Code, CLI) | Terminal on [PRIMARY MACHINE] |
+| Code Reviewer (optional) | Copi (GitHub Copilot Business) | VS Code + GitHub PR integration — add if Copilot Business licence is available |
 | Code Reviewer (optional) | [OPTIONAL: human reviewer] | Direct GitHub access |
 | CEO | [OPTIONAL: mascot] | [Location] |
 
@@ -129,7 +130,7 @@ These rules are enforced at the GitHub level — not a convention, not a guideli
 | Reviewer | GitHub access | Review method |
 |---|---|---|
 | Clead | None — no direct GitHub or repo access | [PO NAME] runs `tools/pr_dump.sh` → pastes output into chat; Clead provides feedback; [PO NAME] posts it as a PR comment. **Required on every PR.** |
-| Copi (GitHub Copilot) | Full — native GitHub integration | Reviews PRs directly in GitHub via Copilot code review. **On request, particularly for code PRs.** |
+| Copi (GitHub Copilot) | Full — native GitHub integration | Reviews PRs directly in GitHub via Copilot code review. **Optional — on request if licence is available.** |
 | [OPTIONAL: human reviewer] | Full — direct GitHub access as collaborator | Reviews PRs directly in GitHub; leaves inline comments. Available async. |
 
 ### Clead Review Standard
