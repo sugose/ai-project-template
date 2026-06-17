@@ -298,6 +298,13 @@ Write `tools/pr_dump.sh`:
 
 Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
 
+Note to Clead: after writing the tools scripts, include this in the Crog setup prompt:
+```bash
+chmod +x tools/dump.sh
+chmod +x tools/pr_dump.sh
+```
+This ensures the scripts are executable on macOS/Linux. On Windows this has no effect but does no harm.
+
 **Step 3 — Set up environment and commit:**
 
 Note to Clead: when producing this prompt, detect the user's OS from context (they will have mentioned Windows or macOS during the conversation, or you can ask) and include only the correct venv activation command. If unsure, ask: "Are you on Windows or macOS?" before producing the Crog setup prompt.
@@ -516,6 +523,13 @@ Write `tools/pr_dump.sh`:
 [verbatim contents of tools/pr_dump.sh from the template repo — copy exactly as-is]
 
 Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
+
+Note to Clead: after writing the tools scripts, include this in the Crog setup prompt:
+```bash
+chmod +x tools/dump.sh
+chmod +x tools/pr_dump.sh
+```
+This ensures the scripts are executable on macOS/Linux. On Windows this has no effect but does no harm.
 
 **Step 3 — Install dependencies and commit:**
 ```bash
