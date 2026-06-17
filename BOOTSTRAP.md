@@ -188,16 +188,20 @@ Report back with the GitHub repo URL and test output.
 
 After Crog confirms setup, ask:
 
-**Question 8:** Has GitHub branch protection been configured?
+**Question 8:** Has GitHub branch protection been configured? (yes/no)
 
-Give instructions for the `master protection` ruleset:
-- Restrict deletions
-- Require PR (0 approvals)
-- Require `build` CI status check
-- Require branch up to date
-- Block force pushes
+If no, ask: Is your repo private or public?
 
-Note: enforcement on private repos requires a GitHub Team organisation.
+- **Public repo:** Branch protection rulesets are enforced on all plans. Proceed with setup.
+- **Private repo on a personal account (free plan):** GitHub does not enforce branch protection rules on private repos on the free plan. You have two options:
+  - **Upgrade to GitHub Team** ($4/user/month) — creates an organisation with enforcement on private repos. Recommended if you want the hard gate.
+  - **Skip enforcement for now** — the workflow still functions; CI runs on every push and Clead reviews every PR. The only difference is that a direct push to master is not blocked at the GitHub level. You rely on discipline rather than enforcement.
+  - Which would you prefer?
+- **Private repo on a GitHub Team or Enterprise plan:** Proceed with setup.
+
+Once the user has decided, give the branch protection ruleset instructions:
+- Ruleset name: `master protection`
+- Rules: restrict deletions, require PR (0 approvals), require `build` CI status check, require branch up to date before merge, block force pushes
 
 ---
 
