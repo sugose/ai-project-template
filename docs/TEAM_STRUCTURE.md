@@ -81,15 +81,12 @@ Crog (Claude Code) has direct terminal and `gh` CLI access — Crog manages its 
 
 ## 4. Day-to-Day Workflow
 
-The normal working pattern:
-
-1. **Clead (browser)** produces an architectural decision, specification, or task description
-2. **[PO NAME]** hands the task to Crog in the terminal session
-3. **Crog (terminal)** implements TDD-first — writes failing tests, then implementation, then opens a PR with `gh pr create`
-4. **[PO NAME]** runs `tools/pr_dump.sh` and pastes the output into Clead's chat
-5. **Clead** reviews — approves, or requests changes with specific feedback; [PO NAME] posts it as a PR comment
-6. **Crog** addresses feedback, pushes new commits to the same branch
-7. **[PO NAME]** merges when CI is green and Clead has approved
+1. Adam picks the next PBI from `docs/PRODUCT_BACKLOG.md`.
+2. Adam pastes the Crog task prompt into Claude Code.
+3. Crog implements, opens a PR, requests Copi review (code PRs only), waits for Copi to complete, runs `pr_dump.sh`, and reports back.
+4. Clead reviews in Claude chat.
+5. Adam merges on Clead's approval.
+6. Adam updates `CHANGELOG.md` and moves to the next PBI.
 
 Clead and Crog are separate instances with separate contexts — Clead sets architecture and reviews; Crog implements. If Crog disagrees with an architectural decision, it raises the concern in the PR description or asks [PO NAME] to relay it; it does not silently deviate.
 
@@ -172,12 +169,13 @@ These requirements exist because Clead reviews from the diff only (not the full 
 
 1. Crog implements on a feature branch (`feature/<description>`) — commits and pushes directly via CLI
 2. Crog opens a Pull Request with `gh pr create`, writing a real description: what, why, how tested
-3. [PO NAME] runs `tools/pr_dump.sh` — pastes output into Clead's chat
-4. **Clead** reviews via the pasted diff — [PO NAME] posts Clead's feedback as a PR comment
-5. **Copi** reviews on request — directly in GitHub via Copilot code review (particularly for code PRs)
-6. Crog addresses feedback, pushes new commits to the same branch
-7. Clead confirms — [PO NAME] posts confirmation as PR comment; CI must be green
-8. Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
+3. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+4. Crog waits for Copi review to complete.
+5. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
+6. **Clead** reviews via the pasted diff — [PO NAME] posts Clead's feedback as a PR comment
+7. Crog addresses feedback, pushes new commits to the same branch
+8. Clead confirms — [PO NAME] posts confirmation as PR comment; CI must be green
+9. Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
 
 ---
 
@@ -186,11 +184,13 @@ These requirements exist because Clead reviews from the diff only (not the full 
 1. Clead produces code (delivered via [PO NAME] into the repo on a feature branch)
 2. [PO NAME] opens a Pull Request on GitHub
 3. [PO NAME] assigns Crog as primary reviewer
-4. **Crog** reviews via `gh` CLI — reads the diff, posts concerns in the PR or asks [PO NAME] to relay them to Clead; checks implementation feasibility, practical concerns, missing edge cases
-5. **Copi** reviews on request — directly in GitHub via Copilot code review
-6. [PO NAME] relays any material feedback to Clead in chat if architectural changes are needed
-7. Clead considers feedback and makes the final technical call as Tech Owner
-8. CI must be green; Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
+4. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+5. Crog waits for Copi review to complete.
+6. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
+7. **Crog** reviews via `gh` CLI — reads the diff, posts concerns in the PR or asks [PO NAME] to relay them to Clead; checks implementation feasibility, practical concerns, missing edge cases
+8. [PO NAME] relays any material feedback to Clead in chat if architectural changes are needed
+9. Clead considers feedback and makes the final technical call as Tech Owner
+10. CI must be green; Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
 
 ---
 
