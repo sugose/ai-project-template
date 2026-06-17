@@ -105,15 +105,19 @@ All notable changes to [PROJECT NAME] are documented here.
 
 After generating all seven documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the START and END markers below and paste it into your Claude Code terminal session."
 
-Note to Clead: wrap the consolidated Crog prompt with these exact markers:
+Note to Clead: when producing the consolidated Crog setup prompt, structure your output exactly like this — no conversational text between the signpost and the prompt block:
 
-```
+"Here is your Crog setup prompt. Everything between the START and END markers is for Crog — do not include anything else inside those markers.
+
 === CROG PROMPT START ===
 
-[prompt contents here]
+Crog — task: initialise [PROJECT NAME] repo
+
+[full prompt contents]
 
 === CROG PROMPT END ===
-```
+
+Once you have pasted that to Crog and it reports back with a green pytest output, come back here and tell me — we will move on to branch protection."
 
 Then produce a single consolidated Crog setup prompt in the format below. Replace every `[full contents of X]` placeholder with the actual file contents — the document you just generated (for the seven project docs) or the verbatim contents of the language pack file (for tooling files). The user should be able to paste the entire prompt to Crog without any further editing.
 
