@@ -2,6 +2,12 @@
 
 A template for AI-assisted software projects using the Clead + Crog + Copi workflow.
 
+## Use this template
+
+Click the **Use this template** button at the top of this repo on GitHub to create a new repo pre-populated with all template files — no cloning or manual setup needed.
+
+Then open `BOOTSTRAP.md` in your new repo, copy everything below the divider line, and paste it into a fresh Claude chat. Clead will walk you through the rest.
+
 ## Supported Languages
 
 | Language | Test framework | Linter/Formatter |
