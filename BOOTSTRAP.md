@@ -71,12 +71,56 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 2. **`docs/CROG_ONBOARDING.md`** — Crog's full onboarding. Language-agnostic core with language-specific code standards section appended. Include:
    - What This Project Is (project description from Question 3)
    - The Team table (Clead, Crog, [PO NAME], Copi, optional human reviewer placeholder)
-   - Git & Workflow Rules (verbatim — non-negotiable)
+   - Git & Workflow Rules (verbatim — non-negotiable):
+
+```
+## Git & Workflow Rules
+
+- **Never commit directly to `main`.** All work happens on feature branches.
+- Branch naming: `feature/<short-description>` or `fix/<short-description>`.
+- One PBI per branch. One PR per branch.
+- Every PR must pass CI (lint, format, tests, coverage) before review.
+- After opening a PR, follow the review rules below before running `pr_dump.sh`.
+- Do not merge your own PRs. Merging is [PO NAME]'s authority.
+- Commit messages must be clear and descriptive. Use the imperative mood: "Add dealer logic" not "Added dealer logic".
+- Keep commits atomic — one logical change per commit.
+
+### PR Review Rules
+
+**Code PRs** (any PR touching files under `src/`):
+1. Open the PR
+2. Request Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+3. Wait for Copi's review to complete — poll with `gh pr view <PR-number> --json reviews` until Copi's status is not `PENDING`
+4. Only then run `bash tools/pr_dump.sh <PR-number>` and report back to Clead with the full output
+
+**Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
+1. Open the PR
+2. Skip Copi — this is not a code review
+3. Run `bash tools/pr_dump.sh <PR-number>` immediately and report back to Clead with the full output
+```
+
    - Code Philosophy & Standards (verbatim core principles, then append language-specific standards for the chosen language)
    - Testing Rules (adapt test framework and commands for chosen language)
    - Benchmark Protocol (no-peek independent implementation pattern)
    - Scope Discipline (placeholder)
-   - Crog's Mandate (verbatim)
+   - Crog's Mandate (verbatim):
+
+```
+## Crog's Mandate
+
+You are the Senior Developer. Your job is to:
+
+1. Read the spec and the PBI before touching any code.
+2. Write tests first.
+3. Implement until tests pass.
+4. Lint and format before committing.
+5. Open a PR with a clear description.
+6. Follow the PR Review Rules above (request Copi for code PRs; skip for docs/tooling).
+7. Run `bash tools/pr_dump.sh <PR-number>` and report back to Clead with the full output.
+8. Never merge your own PRs.
+9. Never commit to `main`.
+```
+
    - Vocabulary (placeholder table)
 
 3. **`docs/TEAM_STRUCTURE.md`** — Full team structure and PR workflow. Keep Clead Review Standard (all 5 points), PR directions A/B/C, branch protection table, and day-to-day workflow verbatim.
@@ -294,7 +338,54 @@ Write `tools/dump.sh`:
 [verbatim contents of tools/dump.sh from the template repo — copy exactly as-is]
 
 Write `tools/pr_dump.sh`:
-[verbatim contents of tools/pr_dump.sh from the template repo — copy exactly as-is]
+```bash
+#!/usr/bin/env bash
+# Usage: bash tools/pr_dump.sh <PR-number>
+# Dumps PR metadata, review comments (including inline), changed files, full diff, and full source context.
+
+set -euo pipefail
+
+PR="${1:?Usage: bash tools/pr_dump.sh <PR-number>}"
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+echo "=== PR #${PR} — METADATA ==="
+gh pr view "$PR" --json title,author,headRefName,baseRefName,state --template \
+  '{{.title}}{{"\n"}}Author: {{.author.login}}{{"\n"}}Branch: {{.headRefName}} -> {{.baseRefName}}{{"\n"}}State:  {{.state}}{{"\n"}}'
+
+echo "CI:     $(gh pr checks "$PR" 2>/dev/null | awk '{print $1"="$2}' | tr '\n' ' ')"
+echo ""
+echo "--- Description ---"
+gh pr view "$PR" --json body -q .body
+echo ""
+
+echo "=== PR #${PR} — REVIEW COMMENTS (top-level) ==="
+gh api "repos/${REPO}/pulls/${PR}/reviews" --paginate \
+  --jq '.[] | "author:\t\(.user.login)\nstatus:\t\(.state | ascii_downcase)\n--\n\(.body)\n--"'
+echo ""
+
+echo "=== PR #${PR} — INLINE COMMENTS ==="
+gh api "repos/${REPO}/pulls/${PR}/comments" --paginate \
+  --jq '.[] | "author:\t\(.user.login)\nfile:\t\(.path)\nline:\t\(.line // .original_line)\n--\n\(.body)\n--"'
+echo ""
+
+echo "=== PR #${PR} — CHANGED FILES ==="
+gh pr diff "$PR" --name-only
+echo ""
+
+echo "=== PR #${PR} — FULL DIFF ==="
+gh pr diff "$PR"
+echo ""
+
+echo "=== FULL SOURCE CONTEXT ==="
+while IFS= read -r file; do
+  [[ "$file" == *.py || "$file" == *.ts || "$file" == *.js ]] || continue
+  HASH=$(gh api "repos/${REPO}/pulls/${PR}" -q .head.sha 2>/dev/null || echo "unknown")
+  echo ""
+  echo "=== FILE: ${file} | GIT VERSION: ${HASH} ==="
+  gh api "repos/${REPO}/contents/${file}?ref=${HASH}" -q '.content' 2>/dev/null \
+    | base64 --decode 2>/dev/null || echo "(could not fetch file)"
+done < <(gh pr diff "$PR" --name-only)
+```
 
 Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
 
@@ -520,7 +611,54 @@ Write `tools/dump.sh`:
 [verbatim contents of tools/dump.sh from the template repo — copy exactly as-is]
 
 Write `tools/pr_dump.sh`:
-[verbatim contents of tools/pr_dump.sh from the template repo — copy exactly as-is]
+```bash
+#!/usr/bin/env bash
+# Usage: bash tools/pr_dump.sh <PR-number>
+# Dumps PR metadata, review comments (including inline), changed files, full diff, and full source context.
+
+set -euo pipefail
+
+PR="${1:?Usage: bash tools/pr_dump.sh <PR-number>}"
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+echo "=== PR #${PR} — METADATA ==="
+gh pr view "$PR" --json title,author,headRefName,baseRefName,state --template \
+  '{{.title}}{{"\n"}}Author: {{.author.login}}{{"\n"}}Branch: {{.headRefName}} -> {{.baseRefName}}{{"\n"}}State:  {{.state}}{{"\n"}}'
+
+echo "CI:     $(gh pr checks "$PR" 2>/dev/null | awk '{print $1"="$2}' | tr '\n' ' ')"
+echo ""
+echo "--- Description ---"
+gh pr view "$PR" --json body -q .body
+echo ""
+
+echo "=== PR #${PR} — REVIEW COMMENTS (top-level) ==="
+gh api "repos/${REPO}/pulls/${PR}/reviews" --paginate \
+  --jq '.[] | "author:\t\(.user.login)\nstatus:\t\(.state | ascii_downcase)\n--\n\(.body)\n--"'
+echo ""
+
+echo "=== PR #${PR} — INLINE COMMENTS ==="
+gh api "repos/${REPO}/pulls/${PR}/comments" --paginate \
+  --jq '.[] | "author:\t\(.user.login)\nfile:\t\(.path)\nline:\t\(.line // .original_line)\n--\n\(.body)\n--"'
+echo ""
+
+echo "=== PR #${PR} — CHANGED FILES ==="
+gh pr diff "$PR" --name-only
+echo ""
+
+echo "=== PR #${PR} — FULL DIFF ==="
+gh pr diff "$PR"
+echo ""
+
+echo "=== FULL SOURCE CONTEXT ==="
+while IFS= read -r file; do
+  [[ "$file" == *.py || "$file" == *.ts || "$file" == *.js ]] || continue
+  HASH=$(gh api "repos/${REPO}/pulls/${PR}" -q .head.sha 2>/dev/null || echo "unknown")
+  echo ""
+  echo "=== FILE: ${file} | GIT VERSION: ${HASH} ==="
+  gh api "repos/${REPO}/contents/${file}?ref=${HASH}" -q '.content' 2>/dev/null \
+    | base64 --decode 2>/dev/null || echo "(could not fetch file)"
+done < <(gh pr diff "$PR" --name-only)
+```
 
 Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
 
@@ -658,7 +796,7 @@ Once the user has decided, give the branch protection ruleset instructions:
 
 Ask:
 
-**Question 9:** What is the first thing you want to build? Describe it in plain language — what it does, what inputs it takes, and what output it produces.
+**Question 9:** What is the first thing you want to build? Describe it in plain language — what it does, what inputs it takes, and what output it produces. Speak conceptually — not in technical terms. You are the Product Owner, not a programmer. Translate conceptual language into technical language only when talking to Crog.
 
 Draft a skeleton `docs/TECHNICAL_PRODUCT_SPECIFICATION.md`:
 - System overview
@@ -697,7 +835,7 @@ Your first PBI: [PBI-1.1 description]
 
 Branch: feature/[short-description]
 TDD strictly — tests first, then implementation.
-Open a PR when done. Run bash tools/pr_dump.sh <PR-number> after opening.
+After opening the PR, follow the PR Review Rules in CROG_ONBOARDING.md — request Copi review for code PRs, wait for it to complete, then run bash tools/pr_dump.sh <PR-number> and report back with the full output.
 ```
 
 Then tell the user:
