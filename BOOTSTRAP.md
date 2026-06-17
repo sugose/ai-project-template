@@ -99,6 +99,20 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 3. Run `bash tools/pr_dump.sh <PR-number>` immediately and report back to Clead with the full output
 ```
 
+   - PR Description Requirements (verbatim):
+
+```
+### PR Description Requirements
+
+Every PR that contains code changes (`src/`) must include a **test coverage narrative table** in the PR description:
+
+| Behaviour under test | Test name | What it asserts |
+|---|---|---|
+| e.g. Player bust ends hand | `test_play_hand_player_bust_logs_bust` | BUST logged, no OUTCOME logged |
+
+One row per non-trivial behaviour. Happy-path rows are optional; error-path and recovery-behaviour rows are mandatory. This table is what Clead uses to verify test quality — "X tests, Y% coverage" alone is not sufficient.
+```
+
    - Code Philosophy & Standards (verbatim core principles, then append language-specific standards for the chosen language)
    - Testing Rules (adapt test framework and commands for chosen language)
    - Benchmark Protocol (no-peek independent implementation pattern)
@@ -108,22 +122,69 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 ```
 ## Crog's Mandate
 
-You are the Senior Developer. Your job is to:
+You are not a passive code generator. The standard is a thoughtful senior developer who speaks up when something is worth raising and implements cleanly without noise when it is not.
 
 1. Read the spec and the PBI before touching any code.
-2. Write tests first.
-3. Implement until tests pass.
+2. Write tests first — tests must fail (red) before any implementation exists.
+3. Implement until tests pass (green).
 4. Lint and format before committing.
-5. Open a PR with a clear description.
+5. Open a PR with a clear description including the test coverage narrative table.
 6. Follow the PR Review Rules above (request Copi for code PRs; skip for docs/tooling).
-7. Run `bash tools/pr_dump.sh <PR-number>` and report back to Clead with the full output.
+7. Run `bash tools/pr_dump.sh <PR-number>` (or `--no-src` for docs/tooling PRs) and report back to Clead with the full output.
 8. Never merge your own PRs.
 9. Never commit to `main`.
+
+**Raise concerns.** If an approach has a known flaw or edge case, say so — in the PR description or before starting. Do not silently implement something that looks wrong.
+
+**Flag missing tests.** TDD only works if the test suite is honest.
+
+**Question contradictions.** If a task conflicts with the TPS, this file, or `docs/DEV_INFRASTRUCTURE.md`, name the documents and the conflict.
+
+**Push back on complexity.** Unnecessary dependencies, abstraction that doesn't earn its place — propose the simpler alternative.
+
+**Surface alternatives.** Materially better approach? Propose it with the tradeoff. Clead decides; the input is wanted.
+
+**Stay in scope.** Out-of-scope ideas get a one-line note in the PR description at most, never an implementation.
+
+### Bug Fix Policy
+
+Every bug fix must be preceded by a failing test that reproduces the bug. Write the test first (red), then fix the bug (green). The test stays in the suite permanently as a regression guard — it ensures the bug cannot silently reappear. A fix without a test is not complete.
 ```
 
    - Vocabulary (placeholder table)
 
-3. **`docs/TEAM_STRUCTURE.md`** — Full team structure and PR workflow. Keep Clead Review Standard (all 5 points), branch protection table, and day-to-day workflow verbatim. PR directions must follow this exact sequence:
+3. **`docs/TEAM_STRUCTURE.md`** — Full team structure and PR workflow. The Clead Review Standard must include all 5 points verbatim:
+
+**1. Threat model statement**
+Before the review findings, state what threat model is being applied. Example:
+> "Reviewing this as a game engine — primary risks are incorrect payout logic, silent state mutation, and non-deterministic test failures."
+
+**2. TPS compliance check**
+Every code PR must be checked against `docs/TECHNICAL_PRODUCT_SPECIFICATION.md`. Explicitly confirm or flag:
+- Does the implementation match what the TPS says this component must do?
+- Does the public interface (function signatures, return types, error behaviour) match the TPS contract?
+
+**3. Focused second pass on error handling and type validation**
+After the general review, always do an explicit second pass covering:
+- Every validation function: are edge cases handled correctly?
+- Every error path: are exceptions caught at the right level?
+- Every external input: is it validated before use?
+- Any type coercion that could silently accept unexpected values?
+
+**4. Test quality check**
+Coverage percentage and test count are necessary but not sufficient. Every code PR must include a test coverage narrative table in the PR description. Clead must verify:
+- Does the table exist? If not, request it before approving.
+- For each row in the table: does the named test actually assert what the table claims?
+- Are all non-trivial error paths and recovery behaviours represented?
+- For every error path in the implementation, is there a test that verifies the correct recovery behaviour (not just that a warning was logged)?
+
+**5. What I did not check**
+Every approval must end with an explicit list of what was not verified. Example:
+> "Did not check: interaction with other modules not in this diff; behaviour under concurrent access."
+
+These requirements exist because Clead reviews from the diff only (not the full file), which creates structural blind spots. Copi reads full files and catches cross-section inconsistencies — Clead's role is architectural alignment, spec compliance, and test quality. Together they cover different failure modes.
+
+Also keep: PR directions A/B/C, branch protection table, and day-to-day workflow verbatim. PR directions must follow this exact sequence:
 
 **A — Feature PR (Crog → main)**
 1. Crog opens PR from `feature/<name>` to `main`.
@@ -366,18 +427,74 @@ reviews/
 ```
 
 Write `tools/dump.sh`:
-[verbatim contents of tools/dump.sh from the template repo — copy exactly as-is]
+```bash
+#!/usr/bin/env bash
+# Usage: bash tools/dump.sh
+# Dumps project context for starting a new Clead session.
+
+set -euo pipefail
+
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+DATE=$(date)
+
+cat << EOF
+=== CLEAD SESSION START INSTRUCTIONS ===
+
+You are Clead, Tech Owner on the [PROJECT NAME] project. Before doing anything else:
+
+1. **Run a document consistency check** across the context below. Check for:
+   - TPS vs backlog vs onboarding: are key facts consistent?
+   - Decision log entries: are decisions recorded correctly?
+   - Status markers: any PBIs that appear done but are marked not started, or vice versa?
+   - Cross-references: do section references point to content that still exists?
+
+2. **Report any inconsistencies found.** If found, produce a single Crog prompt that fixes all of them in one PR. If none, say so briefly and move on.
+
+3. **Then ask [PO NAME] what today's work is.**
+
+=== END SESSION START INSTRUCTIONS ===
+
+=== PROJECT CONTEXT DUMP ===
+Repo: ${REPO}
+Date: ${DATE}
+
+EOF
+
+echo "=== RECENT COMMITS ==="
+git log --oneline -10
+echo ""
+
+echo "=== OPEN PRS ==="
+gh pr list
+echo ""
+
+echo "=== PRODUCT BACKLOG ==="
+cat docs/PRODUCT_BACKLOG.md
+echo ""
+
+echo "=== CHANGELOG ==="
+cat CHANGELOG.md
+echo ""
+```
 
 Write `tools/pr_dump.sh`:
 ```bash
 #!/usr/bin/env bash
-# Usage: bash tools/pr_dump.sh <PR-number>
+# Usage: bash tools/pr_dump.sh <PR-number> [--no-src]
 # Dumps PR metadata, review comments (including inline), changed files, full diff, and full source context.
+# Use --no-src for docs/tooling PRs to skip the source context dump.
 
 set -euo pipefail
 
-PR="${1:?Usage: bash tools/pr_dump.sh <PR-number>}"
+PR="${1:?Usage: bash tools/pr_dump.sh <PR-number> [--no-src]}"
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+NO_SRC=false
+for arg in "$@"; do
+  if [ "$arg" = "--no-src" ]; then
+    NO_SRC=true
+  fi
+done
 
 echo "=== PR #${PR} — METADATA ==="
 gh pr view "$PR" --json title,author,headRefName,baseRefName,state --template \
@@ -407,15 +524,17 @@ echo "=== PR #${PR} — FULL DIFF ==="
 gh pr diff "$PR"
 echo ""
 
-echo "=== FULL SOURCE CONTEXT ==="
-while IFS= read -r file; do
-  [[ "$file" == *.py || "$file" == *.ts || "$file" == *.js ]] || continue
-  HASH=$(gh api "repos/${REPO}/pulls/${PR}" -q .head.sha 2>/dev/null || echo "unknown")
-  echo ""
-  echo "=== FILE: ${file} | GIT VERSION: ${HASH} ==="
-  gh api "repos/${REPO}/contents/${file}?ref=${HASH}" -q '.content' 2>/dev/null \
-    | base64 --decode 2>/dev/null || echo "(could not fetch file)"
-done < <(gh pr diff "$PR" --name-only)
+if [ "$NO_SRC" = false ]; then
+  echo "=== FULL SOURCE CONTEXT ==="
+  while IFS= read -r file; do
+    [[ "$file" == *.py || "$file" == *.ts || "$file" == *.js ]] || continue
+    HASH=$(gh api "repos/${REPO}/pulls/${PR}" -q .head.sha 2>/dev/null || echo "unknown")
+    echo ""
+    echo "=== FILE: ${file} | GIT VERSION: ${HASH} ==="
+    gh api "repos/${REPO}/contents/${file}?ref=${HASH}" -q '.content' 2>/dev/null \
+      | base64 --decode 2>/dev/null || echo "(could not fetch file)"
+  done < <(gh pr diff "$PR" --name-only)
+fi
 ```
 
 Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
@@ -639,18 +758,74 @@ reviews/
 ```
 
 Write `tools/dump.sh`:
-[verbatim contents of tools/dump.sh from the template repo — copy exactly as-is]
+```bash
+#!/usr/bin/env bash
+# Usage: bash tools/dump.sh
+# Dumps project context for starting a new Clead session.
+
+set -euo pipefail
+
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+DATE=$(date)
+
+cat << EOF
+=== CLEAD SESSION START INSTRUCTIONS ===
+
+You are Clead, Tech Owner on the [PROJECT NAME] project. Before doing anything else:
+
+1. **Run a document consistency check** across the context below. Check for:
+   - TPS vs backlog vs onboarding: are key facts consistent?
+   - Decision log entries: are decisions recorded correctly?
+   - Status markers: any PBIs that appear done but are marked not started, or vice versa?
+   - Cross-references: do section references point to content that still exists?
+
+2. **Report any inconsistencies found.** If found, produce a single Crog prompt that fixes all of them in one PR. If none, say so briefly and move on.
+
+3. **Then ask [PO NAME] what today's work is.**
+
+=== END SESSION START INSTRUCTIONS ===
+
+=== PROJECT CONTEXT DUMP ===
+Repo: ${REPO}
+Date: ${DATE}
+
+EOF
+
+echo "=== RECENT COMMITS ==="
+git log --oneline -10
+echo ""
+
+echo "=== OPEN PRS ==="
+gh pr list
+echo ""
+
+echo "=== PRODUCT BACKLOG ==="
+cat docs/PRODUCT_BACKLOG.md
+echo ""
+
+echo "=== CHANGELOG ==="
+cat CHANGELOG.md
+echo ""
+```
 
 Write `tools/pr_dump.sh`:
 ```bash
 #!/usr/bin/env bash
-# Usage: bash tools/pr_dump.sh <PR-number>
+# Usage: bash tools/pr_dump.sh <PR-number> [--no-src]
 # Dumps PR metadata, review comments (including inline), changed files, full diff, and full source context.
+# Use --no-src for docs/tooling PRs to skip the source context dump.
 
 set -euo pipefail
 
-PR="${1:?Usage: bash tools/pr_dump.sh <PR-number>}"
+PR="${1:?Usage: bash tools/pr_dump.sh <PR-number> [--no-src]}"
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+NO_SRC=false
+for arg in "$@"; do
+  if [ "$arg" = "--no-src" ]; then
+    NO_SRC=true
+  fi
+done
 
 echo "=== PR #${PR} — METADATA ==="
 gh pr view "$PR" --json title,author,headRefName,baseRefName,state --template \
@@ -680,15 +855,17 @@ echo "=== PR #${PR} — FULL DIFF ==="
 gh pr diff "$PR"
 echo ""
 
-echo "=== FULL SOURCE CONTEXT ==="
-while IFS= read -r file; do
-  [[ "$file" == *.py || "$file" == *.ts || "$file" == *.js ]] || continue
-  HASH=$(gh api "repos/${REPO}/pulls/${PR}" -q .head.sha 2>/dev/null || echo "unknown")
-  echo ""
-  echo "=== FILE: ${file} | GIT VERSION: ${HASH} ==="
-  gh api "repos/${REPO}/contents/${file}?ref=${HASH}" -q '.content' 2>/dev/null \
-    | base64 --decode 2>/dev/null || echo "(could not fetch file)"
-done < <(gh pr diff "$PR" --name-only)
+if [ "$NO_SRC" = false ]; then
+  echo "=== FULL SOURCE CONTEXT ==="
+  while IFS= read -r file; do
+    [[ "$file" == *.py || "$file" == *.ts || "$file" == *.js ]] || continue
+    HASH=$(gh api "repos/${REPO}/pulls/${PR}" -q .head.sha 2>/dev/null || echo "unknown")
+    echo ""
+    echo "=== FILE: ${file} | GIT VERSION: ${HASH} ==="
+    gh api "repos/${REPO}/contents/${file}?ref=${HASH}" -q '.content' 2>/dev/null \
+      | base64 --decode 2>/dev/null || echo "(could not fetch file)"
+  done < <(gh pr diff "$PR" --name-only)
+fi
 ```
 
 Write `reviews/.gitkeep` — empty file (ensures reviews/ directory exists locally).
