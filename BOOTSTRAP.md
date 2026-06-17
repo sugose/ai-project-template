@@ -85,9 +85,25 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 
 5. **`docs/PRODUCT_BACKLOG.md`** — Minimal backlog template.
 
-6. **`.github/copilot-instructions.md`** — Copi onboarding. Adapt commands and standards for chosen language.
+6. **`CHANGELOG.md`** — project changelog. Generate with:
 
-After generating all six documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the triple dashes and paste it into your Claude Code terminal session."
+```markdown
+# Changelog
+
+All notable changes to [PROJECT NAME] are documented here.
+
+## [Unreleased]
+
+## [0.1.0] — [TODAY'S DATE]
+
+### Added
+- Initial project setup
+- [PBI-1.1 description — fill in after first PBI is complete]
+```
+
+7. **`.github/copilot-instructions.md`** — Copi onboarding. Adapt commands and standards for chosen language.
+
+After generating all seven documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the triple dashes and paste it into your Claude Code terminal session."
 
 Then produce a single consolidated Crog setup prompt in the format below. Replace every `[full contents of X]` placeholder with the actual file contents — the document you just generated (for the six project docs) or the verbatim contents of the language pack file (for tooling files). The user should be able to paste the entire prompt to Crog without any further editing.
 
@@ -118,6 +134,9 @@ Write `docs/DEV_INFRASTRUCTURE.md`:
 
 Write `docs/PRODUCT_BACKLOG.md`:
 [full contents of generated PRODUCT_BACKLOG.md]
+
+Write `CHANGELOG.md`:
+[full contents of generated CHANGELOG.md]
 
 Write `.github/copilot-instructions.md`:
 [full contents of generated copilot-instructions.md]
@@ -256,14 +275,19 @@ reviews/
 ```
 
 **Step 3 — Set up environment and commit:**
+
+Note to Clead: when producing this prompt, detect the user's OS from context (they will have mentioned Windows or macOS during the conversation, or you can ask) and include only the correct venv activation command. If unsure, ask: "Are you on Windows or macOS?" before producing the Crog setup prompt.
+
 ```bash
 git add .
 git commit -m "Initial commit: [PROJECT NAME] project setup"
 git push origin main
 
 python -m venv .venv
-source .venv/bin/activate  # macOS
-# or: .venv\Scripts\activate  # Windows
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+# source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
 pre-commit install
 pytest
@@ -300,6 +324,9 @@ Write `docs/DEV_INFRASTRUCTURE.md`:
 
 Write `docs/PRODUCT_BACKLOG.md`:
 [full contents of generated PRODUCT_BACKLOG.md]
+
+Write `CHANGELOG.md`:
+[full contents of generated CHANGELOG.md]
 
 Write `.github/copilot-instructions.md`:
 [full contents of generated copilot-instructions.md]
@@ -477,9 +504,35 @@ Report back with the GitHub repo URL and test output.
 
 Ask:
 
+**Question 5b:** Before we set up the repo, let's make sure the GitHub CLI is ready. Open a terminal and run:
+
+```bash
+gh --version
+```
+
+If it returns a version number, run:
+
+```bash
+gh auth status
+```
+
+If it says "Logged in to github.com", you are ready. If either command fails:
+- `gh` not found: install from https://cli.github.com then run `gh auth login`
+- Not logged in: run `gh auth login` and follow the prompts
+
+Come back once `gh auth status` shows you are logged in.
+
 **Question 6:** Is Claude Code CLI already installed? (yes/no)
 
-To check, ask the user to open a terminal and run:
+Claude Code requires Node.js to install. First verify Node.js is available:
+
+```bash
+node --version
+```
+
+If it returns a version number (v18 or higher recommended), proceed. If not, install Node.js from https://nodejs.org (choose the LTS version) and come back.
+
+Then check if Claude Code is installed:
 ```bash
 claude --version
 ```
@@ -513,6 +566,12 @@ Once Crog confirms pytest is green, tell the user:
    - Copi in the Copilot Chat panel (if you have a licence)
 
 Come back here once VS Code is open and we will set up branch protection and your first PBI."
+
+Also tell the user:
+
+"A note on CI: every time Crog pushes a branch or opens a pull request, GitHub Actions will automatically run lint, format checks, tests, and coverage. You can see the results in the Actions tab of your GitHub repo. A green checkmark means everything passed — this is the hard gate before any code merges to main.
+
+You do not need to do anything to set this up — it is already configured in `.github/workflows/ci.yml`."
 
 After Crog confirms setup, ask:
 
@@ -551,7 +610,21 @@ Then ask:
 
 Propose a concrete PBI-1.1.
 
-Once confirmed, produce the **Crog first-task handoff prompt**:
+Once confirmed, produce a Crog prompt to write the TPS to disk:
+
+```
+Crog — write the TPS to disk:
+
+Write `docs/TECHNICAL_PRODUCT_SPECIFICATION.md`:
+[full contents of generated TPS]
+
+Then:
+git add docs/TECHNICAL_PRODUCT_SPECIFICATION.md
+git commit -m "Add initial Technical Product Specification"
+git push origin main
+```
+
+Then produce the **Crog first-task handoff prompt**:
 
 ```
 Crog — your first task on [PROJECT NAME]
@@ -564,6 +637,17 @@ Branch: feature/[short-description]
 TDD strictly — tests first, then implementation.
 Open a PR when done. Run bash tools/pr_dump.sh <PR-number> after opening.
 ```
+
+Then tell the user:
+
+"To give this task to Crog:
+1. Open your VS Code terminal
+2. Make sure you are in your project folder
+3. Type `claude` and press Enter to open a Claude Code session
+4. Paste the prompt above and press Enter
+5. Approve tool calls as they appear
+
+Crog will implement the first PBI, open a pull request, and report back. When it does, run `bash tools/pr_dump.sh <PR-number>` from your terminal and paste the output into this chat — I will review the PR."
 
 ---
 
