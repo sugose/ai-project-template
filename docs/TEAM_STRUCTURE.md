@@ -81,12 +81,12 @@ Crog (Claude Code) has direct terminal and `gh` CLI access — Crog manages its 
 
 ## 4. Day-to-Day Workflow
 
-1. Adam picks the next PBI from `docs/PRODUCT_BACKLOG.md`.
-2. Adam pastes the Crog task prompt into Claude Code.
+1. [PO NAME] picks the next PBI from `docs/PRODUCT_BACKLOG.md`.
+2. [PO NAME] pastes the Crog task prompt into Claude Code.
 3. Crog implements, opens a PR, requests Copi review (code PRs only), waits for Copi to complete, runs `pr_dump.sh`, and reports back.
 4. Clead reviews in Claude chat.
-5. Adam merges on Clead's approval.
-6. Adam updates `CHANGELOG.md` and moves to the next PBI.
+5. [PO NAME] merges on Clead's approval.
+6. [PO NAME] updates `CHANGELOG.md` and moves to the next PBI.
 
 Clead and Crog are separate instances with separate contexts — Clead sets architecture and reviews; Crog implements. If Crog disagrees with an architectural decision, it raises the concern in the PR description or asks [PO NAME] to relay it; it does not silently deviate.
 
@@ -170,6 +170,9 @@ These requirements exist because Clead reviews from the diff only (not the full 
 1. Crog implements on a feature branch (`feature/<description>`) — commits and pushes directly via CLI
 2. Crog opens a Pull Request with `gh pr create`, writing a real description: what, why, how tested
 3. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+
+> **Note:** If `gh pr edit --add-reviewer copilot` fails (resolves as unknown user), request Copi review manually via the GitHub web UI — open the PR, click "Reviewers", and select Copilot.
+
 4. Crog waits for Copi review to complete.
 5. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
 6. **Clead** reviews via the pasted diff — [PO NAME] posts Clead's feedback as a PR comment
@@ -185,6 +188,9 @@ These requirements exist because Clead reviews from the diff only (not the full 
 2. [PO NAME] opens a Pull Request on GitHub
 3. [PO NAME] assigns Crog as primary reviewer
 4. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
+
+> **Note:** If `gh pr edit --add-reviewer copilot` fails (resolves as unknown user), request Copi review manually via the GitHub web UI — open the PR, click "Reviewers", and select Copilot.
+
 5. Crog waits for Copi review to complete.
 6. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
 7. **Crog** reviews via `gh` CLI — reads the diff, posts concerns in the PR or asks [PO NAME] to relay them to Clead; checks implementation feasibility, practical concerns, missing edge cases

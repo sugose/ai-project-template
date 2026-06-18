@@ -93,6 +93,8 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 3. Wait for Copi's review to complete — poll with `gh pr view <PR-number> --json reviews` until Copi's status is not `PENDING`
 4. Only then run `bash tools/pr_dump.sh <PR-number>` and report back to Clead with the full output
 
+> **Note:** If `gh pr edit --add-reviewer copilot` fails (resolves as unknown user), request Copi review manually via the GitHub web UI — open the PR, click "Reviewers", and select Copilot.
+
 **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
 1. Open the PR
 2. Skip Copi — this is not a code review
