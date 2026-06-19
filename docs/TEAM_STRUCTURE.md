@@ -165,51 +165,28 @@ These requirements exist because Clead reviews from the diff only (not the full 
 
 ---
 
-### Direction A — Crog is author, Clead is required reviewer, Copi on request (normal workflow)
+### Direction A — Feature/Fix PR (code)
 
-1. Crog implements on a feature branch (`feature/<description>`) — commits and pushes directly via CLI
-2. Crog opens a Pull Request with `gh pr create`, writing a real description: what, why, how tested
-3. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
-
-> **Note:** If `gh pr edit --add-reviewer copilot` fails (resolves as unknown user), request Copi review manually via the GitHub web UI — open the PR, click "Reviewers", and select Copilot.
-
-4. Crog waits for Copi review to complete.
-5. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
-6. **Clead** reviews via the pasted diff — [PO NAME] posts Clead's feedback as a PR comment
-7. Crog addresses feedback, pushes new commits to the same branch
-8. Clead confirms — [PO NAME] posts confirmation as PR comment; CI must be green
-9. Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
+1. Crog opens PR from `feature/<name>` or `fix/<name>` to `main`
+2. Copi review auto-requested by workflow
+3. Crog polls until Copi completes, waits 10s, posts pr_dump as PR comment
+4. Crog reports PR URL to [PO NAME]
+5. [PO NAME] drops URL into Clead's chat
+6. Clead fetches PR directly, reads diff + Copi comments + pr_dump
+7. If changes needed: Clead produces fix prompt → [PO NAME] pastes → Crog pushes → go to step 3
+8. If approved: Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
 
 ---
 
-### Direction B — Clead is author, Crog is primary reviewer, Copi on request
+### Direction B — Docs/Tooling PR
 
-1. Clead produces code (delivered via [PO NAME] into the repo on a feature branch)
-2. [PO NAME] opens a Pull Request on GitHub
-3. [PO NAME] assigns Crog as primary reviewer
-4. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
-
-> **Note:** If `gh pr edit --add-reviewer copilot` fails (resolves as unknown user), request Copi review manually via the GitHub web UI — open the PR, click "Reviewers", and select Copilot.
-
-5. Crog waits for Copi review to complete.
-6. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
-7. **Crog** reviews via `gh` CLI — reads the diff, posts concerns in the PR or asks [PO NAME] to relay them to Clead; checks implementation feasibility, practical concerns, missing edge cases
-8. [PO NAME] relays any material feedback to Clead in chat if architectural changes are needed
-9. Clead considers feedback and makes the final technical call as Tech Owner
-10. CI must be green; Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
-
----
-
-### Direction C — Human reviewer is author, Clead is required reviewer, Crog optional
-
-1. [REVIEWER] implements on a feature branch — commits and pushes directly to GitHub
-2. [REVIEWER] opens a Pull Request on GitHub
-3. [PO NAME] pastes diff into Clead's chat to request review
-4. **Clead** reviews via [PO NAME] — [PO NAME] posts Clead's feedback as a PR comment
-5. **Crog** may review the PR if asked — uses `gh` CLI to inspect the diff
-6. [REVIEWER] addresses feedback directly on GitHub
-7. Clead confirms — [PO NAME] posts confirmation as PR comment; CI must be green
-8. Crog merges on [PO NAME]'s explicit instruction via `gh pr merge`; feature branch deleted
+1. Crog opens PR from `docs/<name>` or `tooling/<name>` to `main`
+2. Skip Copi
+3. Crog posts pr_dump as PR comment
+4. Crog reports PR URL to [PO NAME]
+5. [PO NAME] drops URL into Clead's chat
+6. Clead fetches PR directly, reads diff + pr_dump
+7. Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
 
 ---
 
