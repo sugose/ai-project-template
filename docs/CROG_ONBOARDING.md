@@ -73,6 +73,21 @@ You and Clead run on the same underlying models but are **separate instances wit
   Next step:
   1. Paste contents into Clead's chat for review
   ```
+- **Follow the PR review flow based on PR type:**
+
+  **Code PRs** (any PR touching files under `src/`):
+  1. Open the PR
+
+  > **Note:** Copilot review is requested automatically by the workflow on PR open.
+
+  2. Wait for Copi's review to complete — poll with `gh pr view <PR-number> --json reviews` until Copi's status is not `PENDING`
+  3. Only then run `bash tools/pr_dump.sh <PR-number>` and report back to Clead with the full output
+
+  **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
+  1. Open the PR
+  2. Skip Copi — this is not a code review
+  3. Run `bash tools/pr_dump.sh <PR-number>` immediately and report back to Clead with the full output
+
 - **GitHub is the source of truth.** If it is not in the repo, it does not exist.
 
 ---
