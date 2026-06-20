@@ -68,7 +68,7 @@ You and Clead run on the same underlying models but are **separate instances wit
   6. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
   7. **If Clead requests changes:** implement fixes and push to the same branch. Then:
      a. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
-     b. Go back to step 3.
+     b. Go back to step 4.
   8. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
 
   **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
@@ -85,7 +85,7 @@ You and Clead run on the same underlying models but are **separate instances wit
   6. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
   7. **If Clead requests changes or Copi has open comments:** implement fixes and push to the same branch. Then:
      a. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
-     b. Go back to step 3.
+     b. Go back to step 4.
   8. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
 
 - **GitHub is the source of truth.** If it is not in the repo, it does not exist.

@@ -186,7 +186,7 @@ Clead's verdict prompt includes a merge instruction if and only if Copi has comp
 
 ### Direction B — Docs/Tooling PR
 
-1. Crog opens PR from `docs/<name>` or `tooling/<name>` to `main`
+1. Crog opens PR from `docs/<name>` or `tools/<name>` to `main`
 2. Copi review auto-requested by workflow (request manually via GitHub UI if it does not start)
 3. Crog runs `bash tools/copi_wait.sh <PR-number>`, waits 10s, posts pr_dump as PR comment
 4. Crog reports PR URL to [PO NAME] appended with `?i=1`
