@@ -51,47 +51,42 @@ You and Clead run on the same underlying models but are **separate instances wit
   | e.g. Implausible length stops reader | `test_read_file_stops_on_implausible_declared_length` | Records before corrupt record yielded; records after not yielded; summary counts correct |
 
   One row per non-trivial behaviour. Happy-path rows are optional; error-path and recovery-behaviour rows are mandatory. This table is what Clead uses to verify test quality — "X tests, Y% coverage" alone is not sufficient.
-- **Always run `tools/pr_dump.sh` as the final step after opening a PR.** This generates the review bundle Clead needs to review the PR. Use the appropriate form:
-  - If the PR contains any changes to files under `src/`: `bash tools/pr_dump.sh <PR-number>` (includes full source context)
-  - If the PR is docs-only (no changes under `src/`): `bash tools/pr_dump.sh <PR-number> --no-src` (skips the src dump)
-
-  Output is written to `reviews/pr_<N>_review.txt`. After running, print the following reminder:
-
-  For a PR with src/ changes:
-  ```
-  PR dump written to reviews/pr_<N>_review.txt
-
-  Next steps:
-  1. Paste contents into Clead's chat for architecture review
-  2. Paste contents into Copi's chat for code review (if Copi is available)
-  ```
-
-  For a docs-only PR:
-  ```
-  PR dump written to reviews/pr_<N>_review.txt
-
-  Next step:
-  1. Paste contents into Clead's chat for review
-  ```
+- **After opening a PR, follow the PR review flow below.** The flow covers running `copi_wait.sh`, posting `pr_dump.sh` output as a PR comment, and reporting back to [PO NAME] with the PR URL appended with `?i=1`.
 - **Follow the PR review flow based on PR type:**
 
   **Code PRs** (any PR touching files under `src/`):
   1. Open the PR
-  2. Copi review is requested automatically by the workflow on PR open.
-  3. Poll until Copi review is complete — `gh pr view <PR-number> --json reviews` until Copi's status is not `PENDING`. Then wait 10 seconds for Copi's comments to settle.
-  4. Post the full pr_dump output as a PR comment: `gh pr comment <PR-number> --body "$(bash tools/pr_dump.sh <PR-number>)"`
-  5. Report back to [PO NAME] with the PR URL only.
+  2. Copi review is requested automatically by the workflow on PR open (request manually via GitHub UI if it does not start).
+     Wait for Copi to complete its review before running `pr_dump.sh`.
+     If Copi has open comments requiring resolution, flag them to Clead —
+     do not merge until Copi has no open comments requiring resolution
+     and Clead has issued a merge instruction.
+  3. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
+  4. After Copi completes, wait 10 seconds for comments to settle, then post the full pr_dump output as a PR comment:
+     `gh pr comment <PR-number> --body-file <(bash tools/pr_dump.sh <PR-number>)`
+  5. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
   6. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
-  7. **If Clead requests changes:** implement fixes and push to the same branch. Copi re-review fires automatically via `synchronize` trigger. Go back to step 3.
+  7. **If Clead requests changes:** implement fixes and push to the same branch. Then:
+     a. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
+     b. Go back to step 3.
   8. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
 
   **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
   1. Open the PR
-  2. Skip Copi — this is not a code review.
-  3. Post the full pr_dump output as a PR comment: `gh pr comment <PR-number> --body "$(bash tools/pr_dump.sh <PR-number> --no-src)"`
-  4. Report back to [PO NAME] with the PR URL only.
-  5. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
-  6. Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
+  2. Copi review is requested automatically by the workflow on PR open (request manually via GitHub UI if it does not start).
+     Wait for Copi to complete its review before running `pr_dump.sh`.
+     If Copi has open comments requiring resolution, flag them to Clead —
+     do not merge until Copi has no open comments requiring resolution
+     and Clead has issued a merge instruction.
+  3. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
+  4. After Copi completes, wait 10 seconds for comments to settle, then post the full pr_dump output as a PR comment:
+     `gh pr comment <PR-number> --body-file <(bash tools/pr_dump.sh <PR-number> --no-src)`
+  5. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
+  6. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
+  7. **If Clead requests changes or Copi has open comments:** implement fixes and push to the same branch. Then:
+     a. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
+     b. Go back to step 3.
+  8. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
 
 - **GitHub is the source of truth.** If it is not in the repo, it does not exist.
 

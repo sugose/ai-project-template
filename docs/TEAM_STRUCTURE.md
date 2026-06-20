@@ -83,7 +83,7 @@ Crog (Claude Code) has direct terminal and `gh` CLI access — Crog manages its 
 
 1. [PO NAME] picks the next PBI from `docs/PRODUCT_BACKLOG.md`.
 2. [PO NAME] pastes the Crog task prompt into Claude Code.
-3. Crog implements, opens a PR, requests Copi review (code PRs only), waits for Copi to complete, runs `pr_dump.sh`, and reports back.
+3. Crog implements, opens a PR, waits for Copi to complete its review, runs `pr_dump.sh`, and reports back.
 4. Clead reviews in Claude chat.
 5. [PO NAME] merges on Clead's approval.
 6. [PO NAME] updates `CHANGELOG.md` and moves to the next PBI.
@@ -163,6 +163,12 @@ Every approval must end with an explicit list of what was not verified. Example:
 
 These requirements exist because Clead reviews from the diff only (not the full file), which creates structural blind spots. Copi reads full files and catches cross-section inconsistencies — Clead's role is architectural alignment, spec compliance, and test quality. Together they cover different failure modes.
 
+**6. Verdict prompt discipline**
+Clead's verdict is delivered as a single Crog prompt with no preamble or chat commentary. The review summary goes into the PR comment via Crog — not into the chat. The prompt block must be the only content in Clead's post so [PO NAME] can copy-paste it directly.
+
+**7. Copi review gate**
+Clead's verdict prompt includes a merge instruction if and only if Copi has completed its review and has no open comments requiring resolution. If Copi has not yet reviewed, or has open comments, the verdict prompt must not include a merge instruction — the merge prompt is issued separately once Copi is satisfied.
+
 ---
 
 ### Direction A — Feature/Fix PR (code)
@@ -181,12 +187,13 @@ These requirements exist because Clead reviews from the diff only (not the full 
 ### Direction B — Docs/Tooling PR
 
 1. Crog opens PR from `docs/<name>` or `tooling/<name>` to `main`
-2. Skip Copi
-3. Crog posts pr_dump as PR comment
-4. Crog reports PR URL to [PO NAME]
+2. Copi review auto-requested by workflow (request manually via GitHub UI if it does not start)
+3. Crog runs `bash tools/copi_wait.sh <PR-number>`, waits 10s, posts pr_dump as PR comment
+4. Crog reports PR URL to [PO NAME] appended with `?i=1`
 5. [PO NAME] drops URL into Clead's chat
-6. Clead fetches PR directly, reads diff + pr_dump
-7. Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
+6. Clead fetches PR directly, reads diff + Copi comments + pr_dump
+7. If changes needed or Copi has open comments: Crog pushes fix → run `bash tools/copi_wait.sh <PR-number>` → go to step 3 (increment `?i=N`)
+8. If approved: Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
 
 ---
 
