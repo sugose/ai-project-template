@@ -4,6 +4,9 @@ All notable changes to this template are documented here.
 
 ## [Unreleased]
 
+### Fixed — request-copilot-review.yml: reverted Copi review request from curl REST call back to gh CLI; curl approach broke first-invocation auto-review
+
+
 ### Changed — BOOTSTRAP.md: PR directions restructured from A/B/C (Feature/Fix/Docs) to A/B (code/docs-tooling); hard stop rule, Copi gate, and day-to-day workflow updated to match current standard
 ### Changed — BOOTSTRAP.md: docs/tooling PR flow updated to skip Copi; matches CROG_ONBOARDING.md
 ### Changed — Copi gate rule: Copi review scoped to code PRs (`src/`) only; docs/tooling PRs skip Copi and go straight to Clead
