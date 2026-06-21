@@ -98,11 +98,27 @@ After posting the pr_dump and reporting back to [PO NAME], Crog must stop comple
 - **Do not re-request Copi review** unless instructed by Clead.
 - **Wait** for [PO NAME] to paste a prompt from Clead. That prompt is the only authorised source of next actions.
 
-### Copi Re-review Known Limitation
+## Copi review flow
 
-GitHub provides no public API (REST or GraphQL) to re-trigger a Copi review after it has already submitted one on a PR.
+### First invocation
+Copi is requested automatically via the GitHub ruleset ("Copilot review for default branch") on every PR open — src and non-src alike. No manual action needed. Run `bash tools/copi_wait.sh <PR-number>` and wait for completion before posting pr_dump.
 
-**Current process:** After pushing a fix, run `bash tools/copi_wait.sh <PR-number>`. If it times out, click "Re-request review" in the GitHub UI on the PR, then run `bash tools/copi_wait.sh <PR-number>` again.
+### Re-review (src PRs)
+After pushing a fix to a src PR, re-review is always expected. Tell Adam explicitly: "Please click 'Re-request review' on Copilot in the GitHub UI for PR #<N>, then I will run `bash tools/copi_wait.sh <N>`." Wait for Adam to confirm before running.
+
+### Re-review (non-src PRs)
+Not expected by default. Only request re-review if Clead explicitly instructs it in the verdict prompt. If Clead does instruct it, tell Adam to manually invoke, then run `bash tools/copi_wait.sh <N>`.
+
+### Non-src PR review loop
+Copi steps out after initial review on non-src PRs (unless Clead instructs otherwise), but the Clead/Crog review loop continues until Clead approves. Copi stepping out does not end the loop.
+
+### No Copi credits
+If Copi credits are exhausted, skip `copi_wait.sh` entirely. Post pr_dump and report to Adam. State clearly in the PR report: "Copi credits exhausted — skipping Copi review, going straight to Clead." Resume normal Copi flow when credits are restored.
+
+### Every Copi wait
+Always state clearly what Adam needs to do before running `copi_wait.sh`:
+- First invocation: "No action needed — waiting for Copi to complete."
+- Re-review: "Please click 'Re-request review' on Copilot in the GitHub UI for PR #<N>, then I will run `bash tools/copi_wait.sh <N>`."
 
 - **GitHub is the source of truth.** If it is not in the repo, it does not exist.
 
