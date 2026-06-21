@@ -51,8 +51,10 @@ You and Clead run on the same underlying models but are **separate instances wit
   | e.g. Implausible length stops reader | `test_read_file_stops_on_implausible_declared_length` | Records before corrupt record yielded; records after not yielded; summary counts correct |
 
   One row per non-trivial behaviour. Happy-path rows are optional; error-path and recovery-behaviour rows are mandatory. This table is what Clead uses to verify test quality — "X tests, Y% coverage" alone is not sufficient.
-- **After opening a PR, follow the PR review flow below.** The flow covers running `copi_wait.sh`, posting `pr_dump.sh` output as a PR comment, and reporting back to [PO NAME] with the PR URL appended with `?i=1`.
+- **After opening a PR, follow the PR review flow below.** The flow covers posting `pr_dump.sh` output as a PR comment and reporting back to [PO NAME] with the PR URL appended with `?i=1`.
 - **Follow the PR review flow based on PR type:**
+
+  Copi review applies to code PRs only (`src/`). Docs/tooling PRs skip Copi entirely.
 
   **Code PRs** (any PR touching files under `src/`):
   1. Open the PR
@@ -73,20 +75,34 @@ You and Clead run on the same underlying models but are **separate instances wit
 
   **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
   1. Open the PR
-  2. Copi review is requested automatically by the workflow on PR open (request manually via GitHub UI if it does not start).
-     Wait for Copi to complete its review before running `pr_dump.sh`.
-     If Copi has open comments requiring resolution, flag them to Clead —
-     do not merge until Copi has no open comments requiring resolution
-     and Clead has issued a merge instruction.
-  3. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
-  4. After Copi completes, wait 10 seconds for comments to settle, then post the full pr_dump output as a PR comment:
-     `gh pr comment <PR-number> --body-file <(bash tools/pr_dump.sh <PR-number> --no-src)`
-  5. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
-  6. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
-  7. **If Clead requests changes or Copi has open comments:** implement fixes and push to the same branch. Then:
-     a. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
-     b. Go back to step 4.
-  8. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
+  2. Post the full pr_dump output as a PR comment:
+     `gh pr comment <PR-number> --body "$(bash tools/pr_dump.sh <PR-number> --no-src)"`
+  3. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
+
+     - [ ] Post pr_dump as PR comment
+     - [ ] Report PR URL to [PO NAME] with `?i=1` (increment `i` by 1 on each re-report of the same PR)
+     - [ ] STOP. Wait for [PO NAME] to paste Clead's instruction. Do nothing until then.
+
+  4. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews. Clead produces either a fix prompt or a verdict.
+  5. **If Clead produces a fix prompt:** implement only and exactly what the prompt specifies. Nothing more.
+     a. Push the fix to the same branch.
+     b. Go back to step 2.
+  6. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
+
+### Copi Finding Scope — Hard Stop Rule
+
+After posting the pr_dump and reporting back to [PO NAME], Crog must stop completely. This applies to all PR types; for code PRs, Copi is involved — for docs/tooling PRs, Copi is not. In both cases the rule is the same:
+
+- **Do not read Copi's inline comments** with intent to act on them.
+- **Do not push any fix** based on Copi's findings.
+- **Do not re-request Copi review** unless instructed by Clead.
+- **Wait** for [PO NAME] to paste a prompt from Clead. That prompt is the only authorised source of next actions.
+
+### Copi Re-review Known Limitation
+
+GitHub provides no public API (REST or GraphQL) to re-trigger a Copi review after it has already submitted one on a PR.
+
+**Current process:** After pushing a fix, run `bash tools/copi_wait.sh <PR-number>`. If it times out, click "Re-request review" in the GitHub UI on the PR, then run `bash tools/copi_wait.sh <PR-number>` again.
 
 - **GitHub is the source of truth.** If it is not in the repo, it does not exist.
 
