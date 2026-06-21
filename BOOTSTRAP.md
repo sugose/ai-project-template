@@ -87,6 +87,8 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 
 ### PR Review Rules
 
+Copi review applies to code PRs only (`src/`). Docs/tooling PRs skip Copi entirely.
+
 **Code PRs** (any PR touching files under `src/`):
 1. Open the PR
 2. Request Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
@@ -97,8 +99,19 @@ Read `docs/TECHNICAL_PRODUCT_SPECIFICATION.md` before writing any code. Never co
 
 **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
 1. Open the PR
-2. Skip Copi — this is not a code review
-3. Run `bash tools/pr_dump.sh <PR-number>` immediately and report back to Clead with the full output
+2. Post the full pr_dump output as a PR comment:
+   `gh pr comment <PR-number> --body "$(bash tools/pr_dump.sh <PR-number> --no-src)"`
+3. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
+
+   - [ ] Post pr_dump as PR comment
+   - [ ] Report PR URL to [PO NAME] with `?i=1` (increment `i` by 1 on each re-report of the same PR)
+   - [ ] STOP. Wait for [PO NAME] to paste Clead's instruction. Do nothing until then.
+
+4. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews. Clead produces either a fix prompt or a verdict.
+5. **If Clead produces a fix prompt:** implement only and exactly what the prompt specifies. Nothing more.
+   a. Push the fix to the same branch.
+   b. Go back to step 2.
+6. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
 ```
 
    - PR Description Requirements (verbatim):
