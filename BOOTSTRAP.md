@@ -199,35 +199,38 @@ Every approval must end with an explicit list of what was not verified. Example:
 
 These requirements exist because Clead reviews from the diff only (not the full file), which creates structural blind spots. Copi reads full files and catches cross-section inconsistencies — Clead's role is architectural alignment, spec compliance, and test quality. Together they cover different failure modes.
 
-Also keep: PR directions A/B/C, branch protection table, and day-to-day workflow verbatim. PR directions must follow this exact sequence:
+**6. Verdict prompt discipline**
+Clead's verdict is delivered as a single Crog prompt with no preamble or chat commentary. The review summary goes into the PR comment via Crog — not into the chat. The prompt block must be the only content in Clead's post so [PO NAME] can copy-paste it directly.
 
-**A — Feature PR (Crog → main)**
-1. Crog opens PR from `feature/<name>` to `main`.
-2. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
-3. Crog waits for Copi review to complete.
-4. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
-5. Clead reviews in Claude chat.
-6. [PO NAME] merges once CI is green and Clead approves.
+**7. Copi review gate**
+Clead's verdict prompt includes a merge instruction if and only if Copi has completed its review and has no open comments requiring resolution. If Copi has not yet reviewed, or has open comments, the verdict prompt must not include a merge instruction — the merge prompt is issued separately once Copi is satisfied. This gate applies to code PRs only. Docs/tooling PRs do not require Copi review and may be merged on Clead's approval alone.
 
-**B — Fix PR (Crog → main)**
-1. Crog opens PR from `fix/<name>` to `main`.
-2. Crog requests Copi review: `gh pr edit <PR-number> --add-reviewer copilot`
-3. Crog waits for Copi review to complete.
-4. Crog runs `bash tools/pr_dump.sh <PR-number>` and reports to Clead with the full output.
-5. Clead reviews in Claude chat.
-6. [PO NAME] merges once CI is green and Clead approves.
+Also keep: PR directions A/B, branch protection table, and day-to-day workflow verbatim. PR directions must follow this exact structure:
 
-**C — Spec/Docs PR (Clead → main)**
-1. Clead produces updated doc content.
-2. Crog writes the file to disk, commits, and opens a PR.
-3. Skip Copi — docs-only PR.
-4. Crog runs `bash tools/pr_dump.sh <PR-number>` immediately and reports to Clead.
-5. [PO NAME] reviews and merges directly.
+**A — Feature/Fix PR (code)**
+1. Crog opens PR from `feature/<name>` or `fix/<name>` to `main`
+2. Copi review auto-requested by workflow (fires only on PRs touching `src/`)
+3. Crog polls until Copi completes, waits 10s, posts pr_dump as PR comment
+4. Crog reports PR URL to [PO NAME] with `?i=1` (increment `i` by 1 on each re-report of the same PR)
+5. [PO NAME] drops URL into Clead's chat
+6. Clead fetches PR directly, reads diff + Copi comments + pr_dump
+7. If changes needed: Clead produces fix prompt → [PO NAME] pastes → Crog implements only what the prompt specifies → pushes → runs `bash tools/copi_wait.sh <PR-number>` → posts pr_dump → reports `?i=1` to [PO NAME] (increment `i` by 1 on each re-report of the same PR) → **stops and waits**. Go back to step 5.
+8. If approved: Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
+
+**B — Docs/Tooling PR** (Copi is not involved — go straight to Clead)
+1. Crog opens PR from `docs/<name>` or `tooling/<name>` to `main`
+2. Crog posts pr_dump as PR comment: `gh pr comment <PR-number> --body "$(bash tools/pr_dump.sh <PR-number> --no-src)"` and reports PR URL to [PO NAME] with `?i=1` (increment `i` by 1 on each re-report of the same PR)
+3. [PO NAME] drops URL into Clead's chat
+4. Clead fetches PR directly, reads diff + pr_dump
+5. If Clead requests changes: Clead produces fix prompt → [PO NAME] pastes → Crog implements only what the prompt specifies → pushes → posts pr_dump → reports `?i=1` to [PO NAME] (increment `i` by 1 on each re-report of the same PR) → **stops and waits**. Go back to step 3.
+6. If approved: Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
+
+**Hard stop rule:** After posting the pr_dump and reporting back to [PO NAME], Crog stops completely — for both PR types. For code PRs, this follows Copi's review; for docs/tooling PRs, Copi is not involved and the stop applies immediately after posting pr_dump. In both cases: Crog does not read or act on Copi's comments, does not push any fix based on Copi's findings, and waits for [PO NAME] to paste Clead's instruction. Clead is the mandatory gate on every iteration. No exceptions except Crog's own unambiguous mechanical mistakes before the first Clead review.
 
 Day-to-day workflow:
 1. [PO NAME] picks the next PBI from `docs/PRODUCT_BACKLOG.md`.
 2. [PO NAME] pastes the Crog task prompt into Claude Code.
-3. Crog implements, opens a PR, requests Copi review (code PRs only), waits for Copi to complete, runs `pr_dump.sh`, and reports back.
+3. Crog implements, opens a PR, waits for Copi to complete its review (code PRs only — docs/tooling PRs skip Copi), runs `pr_dump.sh`, and reports back.
 4. Clead reviews in Claude chat.
 5. [PO NAME] merges on Clead's approval.
 6. [PO NAME] updates `CHANGELOG.md` and moves to the next PBI.
