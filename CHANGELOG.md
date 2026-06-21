@@ -4,6 +4,11 @@ All notable changes to this template are documented here.
 
 ## [Unreleased]
 
+### Changed — Copi gate rule: Copi review scoped to code PRs (`src/`) only; docs/tooling PRs skip Copi and go straight to Clead
+### Changed — request-copilot-review.yml: workflow now only triggers on PRs touching `src/`; docs/tooling PRs no longer invoke Copi automatically
+### Changed — pr_dump.sh: output wrapped in fenced code block so inline comment bodies render correctly in GitHub PR comments
+### Added — Copi re-review known limitation documented in CROG_ONBOARDING.md
+
 ### Added
 - Placeholder test files in each language pack — keeps CI green from day one
 
