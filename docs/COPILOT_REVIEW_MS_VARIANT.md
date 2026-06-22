@@ -15,7 +15,7 @@
 - Do not add the `ai-review` label unless a new run is expected to produce meaningfully different input
 - Do not add `ai-review` if it is already present on the PR
 - Do not push changes while an automated review run is in progress — the run will be stale
-- A run is complete when its review comment is visible in the PR UI
+- A run is complete when its review output is visible in the PR UI
 - Remove the `ai-review` label after every run, including failed runs
 - Do not retry failed re-reviews — escalate to human tech lead review instead
 - Treat all automated Copilot output as advisory only — never authoritative
@@ -201,6 +201,7 @@ The `ai-review` label is a single-use trigger, not a persistent state.
 Invariants:
 - The label MUST NOT persist beyond the run that it triggers
 - The label MUST NOT be added if already present
+- The label MUST NOT be added while a run is already in progress on the same PR — if in doubt, check the PR UI before adding
 - A PR MUST NOT have more than one active label instance at a time
 - Adding the label MUST correspond to a deliberate decision to run automated review
 - The label MUST NOT be added unless a new run is expected to produce meaningfully different input
