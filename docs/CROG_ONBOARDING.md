@@ -139,13 +139,13 @@ https://github.com/<owner>/<repo>/blob/<branch>/<file2>?pr=<N>&i=1
 
 `<branch>` is the head branch of the PR. Append `?pr=<N>&i=<iteration>` to every changed file URL to prevent caching. Increment `i` on each re-report of the same PR.
 
-### Copi suspended mode
-When Adam announces "Copi suspended", the following rules apply for all PRs until Adam announces resumption:
+### Copi review
 
-- Do NOT run `bash tools/copi_wait.sh` at any point.
-- Do NOT request Copi review.
-- Clead reviews with full file context in place of Copi. The Clead/Crog fix loop continues as normal until Clead approves.
-- On resumption, revert to the standard Copi flow immediately.
+Crog does not interact with Copi at all. No polling, no waiting, no review requests. Open the PR, post pr_dump immediately (use `--no-src` for docs/tooling PRs, full pr_dump for code PRs), report to Adam, stop.
+
+Whether Copi reviews a given PR is Clead's call, communicated via the `ai-review` label which Adam adds to the PR on Clead's instruction. The workflow `.github/workflows/copilot-review.yml` handles the rest.
+
+If Clead requests a Copi pass mid-PR, the instruction will come back through Adam as a normal Clead message. Crog does not need to anticipate or track Copi state.
 
 - **GitHub is the source of truth.** If it is not in the repo, it does not exist.
 
