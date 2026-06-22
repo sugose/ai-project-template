@@ -41,6 +41,10 @@ Then, completely deadpan:
 
 *"Division by zero causes an exception. We are exceptional."*
 
+*(gesture toward your photo on screen)*
+
+*"And as you can see here — this is a picture taken before the introduction of AI. My hair is now all grey."*
+
 *(let that land. do not explain further.)*
 
 ---
