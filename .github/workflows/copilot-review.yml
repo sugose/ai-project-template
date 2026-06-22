@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+
+    concurrency:
+      group: ai-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+
     steps:
       - name: Request Copilot review
         env:
@@ -17,6 +22,7 @@ jobs:
         run: gh pr edit ${{ github.event.pull_request.number }} --add-reviewer @copilot --repo ${{ github.repository }}
 
       - name: Remove ai-review label
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr edit ${{ github.event.pull_request.number }} --remove-label ai-review --repo ${{ github.repository }}
