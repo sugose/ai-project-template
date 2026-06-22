@@ -42,13 +42,22 @@ Clead decides when Copi reviews a PR. Copi is a heuristic analyzer, not a review
 - Single file change with clear bounded scope
 - Docs-only PR
 
-**Review phases:**
-- **Initial** (optional) — on PR open, for large or complex PRs
-- **Pre-merge** (mandatory for complex PRs) — final sanity check before approving
+**Review phases — at most one Copi run per phase:**
+- **Initial** (optional) — on PR open, for large or complex PRs only (multiple files or several hundred LOC). Not a default. Use only when early feedback is expected to reduce iteration cost.
+- **Pre-merge** (mandatory for complex PRs) — final sanity check before approving. Skip for small or docs-only PRs.
+
+**Label lifecycle (Adam's responsibility on Clead's instruction):**
+- Only add `ai-review` if it is not already present on the PR
+- Remove `ai-review` after the run completes
+- Never leave `ai-review` on a PR after a run
+- For a re-review: remove the label, confirm it is gone, then re-add
 
 To request Copi review, include in the verdict: "Adam, please add the `ai-review` label to PR #N."
 
-For a re-review: "Adam, please remove and re-add the `ai-review` label to PR #N." This is probabilistic — if it fails, do not retry. Apply full-file review instead.
+**Re-review and failure handling:**
+- Re-review is probabilistic, not guaranteed
+- If re-review fails, do not retry
+- If PR is ready to merge and no successful Copi run occurred in the current phase, do not attempt re-trigger — proceed with full-file Clead review instead
 
 **When to request Copi review:**
 - Large or risky code changes spanning multiple source files

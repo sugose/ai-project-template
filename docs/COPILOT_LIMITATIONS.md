@@ -4,6 +4,20 @@
 
 ---
 
+## Quick Rules
+
+> Read this before the rest of the document.
+
+- Never run Copilot on every push — use label-based triggering only
+- At most one Copilot run per review phase (initial or pre-merge)
+- Skip PRs with fewer than 50 LOC changed, single-file changes, or docs-only PRs
+- Do not retry failed re-reviews — escalate to full-file tech lead review instead
+- Treat all Copilot output as advisory only — never authoritative
+- Remove the `ai-review` label after each run completes
+- Only add `ai-review` if it is not already present on the PR
+
+---
+
 ## 1. One review per PR by default
 
 **Limitation:** With the native ruleset ("Automatically request Copilot code review"), Copilot reviews a PR once on open and never again, unless "Review new pushes" is also enabled.
@@ -20,7 +34,7 @@
 
 **Mitigation:** Under the label-based workflow, removing and re-adding the `ai-review` label may trigger a new workflow run. This is probabilistic, not deterministic — Copilot's backend can still deduplicate based on diff similarity, PR state, or previous review markers. Do not treat label re-add as a reliable re-review guarantee.
 
-**Fallback:** If re-review fails or is unreliable, do not retry. Escalate to full-file tech lead review instead. Chasing Copilot behaviour wastes time and tokens.
+**Fallback:** If re-review fails, do not retry. Escalate to full-file tech lead review instead. Chasing Copilot behaviour wastes time and tokens.
 
 **Acceptance:** Manual UI re-request remains the only guaranteed path. GitHub community has an open feature request for API support (https://github.com/orgs/community/discussions/186152).
 
@@ -44,7 +58,7 @@
 
 **Limitation:** "Review new pushes" causes Copilot to run a full review on every push to every open PR. On a multi-iteration workflow (5+ pushes per PR, 10+ files, moderate diff size), this amounts to 5× the reviews actually needed. Each review consumes AI credits, and from June 1 2026, also consumes GitHub Actions minutes on private repositories.
 
-**Mitigation:** Disable "Review new pushes." Use label-based triggering to run Copilot exactly once per PR, or at specific deliberate points.
+**Mitigation:** Disable "Review new pushes." Use label-based triggering to run Copilot exactly once per PR phase, at specific deliberate points.
 
 **Acceptance:** None — this is avoidable waste. Label-based is strictly better for credit management.
 
@@ -62,7 +76,7 @@
 
 ## 6. Review quality is diff-bounded
 
-**Limitation:** Copilot reviews the PR diff, not the full codebase. Cross-file consistency issues that don't appear in the diff are missed. This affects refactors, interface changes, implicit contracts, and shared utilities — essentially anything non-local. The impact is larger than it appears because these are precisely the changes most likely to introduce subtle bugs.
+**Limitation:** Copilot reviews the PR diff, not the full codebase. Copilot cannot detect inconsistencies in code that is not part of the diff, even if the change logically affects it. This affects refactors, interface changes, implicit contracts, and shared utilities — essentially anything non-local. The impact is larger than it appears because these are precisely the changes most likely to introduce subtle bugs.
 
 **Observed failure:** A strategy interface change in one file was not caught in a dependent file on the initial review pass — Copilot only flagged it when the dependent file appeared in a later iteration's diff. Had the PR been merged after the first iteration, the bug would have shipped.
 
@@ -98,7 +112,7 @@ This section describes the review policies and workflow we have arrived at after
 
 ### Team structure
 
-The team consists of a product owner, a tech lead (AI), a developer (AI), and Copilot as an automated code reviewer. The product owner coordinates between roles. The tech lead owns architecture, design decisions, and PR review authority. The developer implements and pushes code. Copilot provides a selective, advisory first-pass review on code PRs when explicitly requested.
+The team consists of a product owner, a tech lead (AI), a developer (AI), and Copilot as an automated code reviewer. The product owner coordinates between roles and owns label lifecycle management — adding and removing the `ai-review` label on the tech lead's instruction. The tech lead owns architecture, design decisions, PR review authority, and the decision of when Copilot review adds value. The developer implements and pushes code. Copilot provides selective, advisory input on code PRs when explicitly requested.
 
 ### Copilot is a heuristic analyzer, not a reviewer
 
@@ -106,13 +120,22 @@ A key mindset shift: Copilot does not review code in the way a human reviewer do
 
 The correct mental model is: **Copilot is a heuristic analyzer that provides targeted, advisory input on visible diff content.** Its output is never authoritative. Do not chase completeness. Do not re-run to get a better answer. Use it as a selective second opinion — an uncertainty amplifier that surfaces issues the tech lead can then investigate with full context.
 
+### Three-layer review system
+
+The workflow implements three complementary layers:
+
+- **Layer 1 — Copilot:** fast, shallow, targeted, probabilistic. Catches common issues in the visible diff.
+- **Layer 2 — Tech lead:** deep, contextual, deterministic. Full-file review for interface changes and cross-file consistency.
+- **Layer 3 — Process:** labels and phases control cost, timing, and scope. Prevents automation theatre.
+
 ### PR flow
 
 1. The developer opens a PR and posts a structured dump of the PR state as a comment.
 2. The product owner hands the PR URL to the tech lead.
 3. The tech lead reviews the PR — see review depth policy below — and issues a verdict.
-4. If changes are needed, the developer pushes a fix and the process repeats.
-5. When the tech lead approves, the developer merges.
+4. If the tech lead requests a Copilot review, the product owner adds the `ai-review` label. After the run completes, the product owner removes the label.
+5. If changes are needed, the developer pushes a fix and the process repeats from step 3.
+6. When the tech lead approves, the developer merges.
 
 ### Review depth policy
 
@@ -126,31 +149,40 @@ The tech lead states the review depth applied and the reason in every verdict.
 
 ### Copilot review policy
 
-Copilot is invoked via a label-based GitHub Actions workflow (`.github/workflows/copilot-review.yml`). Adding the `ai-review` label to a PR triggers a single Copilot review. The tech lead decides when to request Copilot review and includes the instruction in the verdict.
+Copilot is invoked via a label-based GitHub Actions workflow (`.github/workflows/copilot-review.yml`). The `ai-review` label triggers a single Copilot review. At most one Copilot review is permitted per phase.
+
+**Label lifecycle (product owner responsibility):**
+- Only add `ai-review` if it is not already present on the PR
+- Remove `ai-review` after the run completes
+- Never leave `ai-review` on a PR after a run — prevents ghost state and accidental re-triggers
+- For a re-review: remove the label, confirm it is gone, then re-add
 
 **PR size guardrail — skip Copilot if:**
 - Fewer than 50 lines of code changed
 - Single file change with clear bounded scope
 - Docs-only PR
 
-**Review phases:**
-- **Initial** (optional) — on PR open, for large or complex PRs where an early Copilot pass adds value
-- **Pre-merge** (mandatory for complex PRs) — final sanity check before tech lead approves
+**Review phases — at most one Copilot run per phase:**
+- **Initial** (optional) — on PR open, for large or complex PRs only (more than a few files or more than a few hundred LOC). Not a default. Use only when early feedback is expected to reduce iteration cost.
+- **Pre-merge** (mandatory for complex PRs) — final sanity check before tech lead approval. Skip for small or docs-only PRs.
 
 **Copilot review is requested for:**
 - Large or risky code changes spanning multiple source files
 - New modules or significant interface changes
-- Final pre-merge sanity check on complex PRs
+- Pre-merge sanity check on complex PRs
 - When the tech lead's own review flags uncertainty
 
 **Copilot review is not requested for:**
 - Docs and tooling-only PRs
 - Small targeted fixes (< 50 LOC, single file)
 - Iterative commits on a PR that already had a Copilot pass at the same phase
+- When credits are exhausted
 
-### Re-review policy
-
-For a Copilot re-review after a fix push, the product owner removes and re-adds the `ai-review` label. This is probabilistic — if it fails, do not retry. The tech lead escalates to full-file review instead.
+**Re-review and failure handling:**
+- Re-review is probabilistic, not guaranteed
+- If re-review fails, do not retry
+- If PR is ready to merge and no successful Copilot run occurred in the current phase, do not attempt re-trigger — proceed with full tech lead review instead
+- Escalate all re-review failures to full-file tech lead review
 
 ### Credit management
 
