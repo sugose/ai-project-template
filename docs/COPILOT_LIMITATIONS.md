@@ -11,10 +11,13 @@
 - Never run Copilot on every push — use label-based triggering only
 - At most one Copilot run per review phase (initial or pre-merge)
 - Skip PRs with fewer than 50 LOC changed, single-file changes, or docs-only PRs
+- Do not add the `ai-review` label unless a new run is expected to produce meaningfully different input
+- Do not add `ai-review` if it is already present on the PR
+- Do not push changes while a Copilot run is in progress — the run will be stale
+- A Copilot run is complete when its review comment is visible in the PR UI
+- Remove the `ai-review` label after every run, including failed runs
 - Do not retry failed re-reviews — escalate to full-file tech lead review instead
 - Treat all Copilot output as advisory only — never authoritative
-- Remove the `ai-review` label after each run completes
-- Only add `ai-review` if it is not already present on the PR
 
 ---
 
@@ -34,7 +37,9 @@
 
 **Mitigation:** Under the label-based workflow, removing and re-adding the `ai-review` label may trigger a new workflow run. This is probabilistic, not deterministic — Copilot's backend can still deduplicate based on diff similarity, PR state, or previous review markers. Do not treat label re-add as a reliable re-review guarantee.
 
-**Fallback:** If re-review fails, do not retry. Escalate to full-file tech lead review instead. Chasing Copilot behaviour wastes time and tokens.
+**Re-review rules:** Re-review is permitted only after changes that affect program behaviour — logic, interfaces, or data flow. Formatting, comments, or non-functional changes do not justify re-review.
+
+**Fallback:** If re-review fails, do not retry. Escalate to full-file tech lead review instead.
 
 **Acceptance:** Manual UI re-request remains the only guaranteed path. GitHub community has an open feature request for API support (https://github.com/orgs/community/discussions/186152).
 
@@ -90,7 +95,7 @@
 
 **Limitation:** Copilot review completion is not synchronised to any webhook or API event that is easily pollable. Polling scripts frequently time out before Copilot finishes, even with generous timeouts.
 
-**Mitigation:** Under the label-based workflow, polling scripts are no longer needed. The product owner confirms Copilot is done by checking the GitHub UI before handing the PR to the tech lead for review.
+**Mitigation:** Under the label-based workflow, polling scripts are no longer needed. The product owner confirms Copilot is done by checking the GitHub UI (review comment visible) before handing the PR to the tech lead for review.
 
 **Acceptance:** Acceptable under the new flow — the human check replaces the unreliable poll.
 
@@ -133,8 +138,8 @@ The workflow implements three complementary layers:
 1. The developer opens a PR and posts a structured dump of the PR state as a comment.
 2. The product owner hands the PR URL to the tech lead.
 3. The tech lead reviews the PR — see review depth policy below — and issues a verdict.
-4. If the tech lead requests a Copilot review, the product owner adds the `ai-review` label. After the run completes, the product owner removes the label.
-5. If changes are needed, the developer pushes a fix and the process repeats from step 3.
+4. If the tech lead requests a Copilot review, the product owner adds the `ai-review` label. The workflow runs Copilot and removes the label automatically on completion (including on failure).
+5. If changes are needed, the developer pushes a fix and the process repeats from step 3. Do not push changes while a Copilot run is in progress.
 6. When the tech lead approves, the developer merges.
 
 ### Review depth policy
@@ -149,13 +154,57 @@ The tech lead states the review depth applied and the reason in every verdict.
 
 ### Copilot review policy
 
-Copilot is invoked via a label-based GitHub Actions workflow (`.github/workflows/copilot-review.yml`). The `ai-review` label triggers a single Copilot review. At most one Copilot review is permitted per phase.
+Copilot is invoked via a label-based GitHub Actions workflow (`.github/workflows/copilot-review.yml`). The `ai-review` label triggers a single Copilot review. At most one Copilot review is permitted per phase. The workflow enforces label cleanup automatically — the label is removed after every run, including failed runs.
 
-**Label lifecycle (product owner responsibility):**
-- Only add `ai-review` if it is not already present on the PR
-- Remove `ai-review` after the run completes
-- Never leave `ai-review` on a PR after a run — prevents ghost state and accidental re-triggers
-- For a re-review: remove the label, confirm it is gone, then re-add
+**Label lifecycle — formal contract:**
+
+The `ai-review` label is a single-use trigger, not a persistent state.
+
+| State | Meaning |
+|---|---|
+| Label absent | No Copilot activity pending |
+| Label present | One Copilot run is in progress or just triggered |
+
+Invariants:
+- The label MUST NOT persist beyond the run that it triggers
+- The label MUST NOT be added if already present
+- A PR MUST NOT have more than one active label instance at a time
+- Adding the label MUST correspond to a deliberate decision to run Copilot
+- The label MUST NOT be added unless a new run is expected to produce meaningfully different input
+
+Lifecycle transitions:
+```
+(no label)
+    ↓ add
+ai-review
+    ↓ (Copilot runs — do not push changes during this window)
+(label auto-removed by workflow)
+    ↓
+(no label)
+```
+
+Re-review transition:
+```
+(no label)
+    ↓ add  ← only after meaningful logic/interface/data change
+ai-review   ← non-deterministic; may not produce a new review
+    ↓
+(label auto-removed)
+```
+
+Failure handling:
+- If no review is produced → label is still removed (workflow uses `if: always()`)
+- Do not retry → escalate to full-file tech lead review
+
+**Label quick reference (product owner):**
+
+| Situation | Action |
+|---|---|
+| Tech lead requests Copi review | Add `ai-review` (only if absent) |
+| Run complete (review visible in UI) | Label already removed by workflow |
+| Re-review needed after logic change | Remove label if present, re-add once |
+| Re-review fails | Do not retry — inform tech lead |
+| Credits exhausted | Do not add label — inform tech lead |
 
 **PR size guardrail — skip Copilot if:**
 - Fewer than 50 lines of code changed
@@ -163,26 +212,38 @@ Copilot is invoked via a label-based GitHub Actions workflow (`.github/workflows
 - Docs-only PR
 
 **Review phases — at most one Copilot run per phase:**
-- **Initial** (optional) — on PR open, for large or complex PRs only (more than a few files or more than a few hundred LOC). Not a default. Use only when early feedback is expected to reduce iteration cost.
+- **Initial** (optional) — on PR open, for large or complex PRs only (multiple files or several hundred LOC). Not a default. Use only when early feedback is expected to reduce iteration cost.
 - **Pre-merge** (mandatory for complex PRs) — final sanity check before tech lead approval. Skip for small or docs-only PRs.
 
-**Copilot review is requested for:**
+**When to request Copilot review:**
 - Large or risky code changes spanning multiple source files
 - New modules or significant interface changes
 - Pre-merge sanity check on complex PRs
 - When the tech lead's own review flags uncertainty
 
-**Copilot review is not requested for:**
+**When NOT to request Copilot review:**
 - Docs and tooling-only PRs
 - Small targeted fixes (< 50 LOC, single file)
 - Iterative commits on a PR that already had a Copilot pass at the same phase
+- No meaningful behaviour change since last run
 - When credits are exhausted
 
-**Re-review and failure handling:**
-- Re-review is probabilistic, not guaranteed
-- If re-review fails, do not retry
-- If PR is ready to merge and no successful Copilot run occurred in the current phase, do not attempt re-trigger — proceed with full tech lead review instead
-- Escalate all re-review failures to full-file tech lead review
+### Enforcement philosophy
+
+The enforcement layer exists to protect a human-driven workflow from accidental misuse, not to automate decision-making.
+
+Copilot is non-deterministic, stateless across runs, and cost-incurring. Therefore the system enforces only what must be consistent:
+
+- One trigger → one run
+- No duplicate execution
+- No leftover trigger state
+- No run without a deliberate decision
+
+Everything else — when to run, why to run, whether it adds value — remains a human decision.
+
+**Automation enforces discipline. It does not replace judgement.**
+
+The enforcement layer prevents accidental re-runs, guarantees clean state after execution, and ensures predictable behaviour. It does not ensure correctness of Copilot output, guarantee re-review success, or decide when Copilot should be used.
 
 ### Credit management
 

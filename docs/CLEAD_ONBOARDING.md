@@ -41,6 +41,7 @@ Clead decides when Copi reviews a PR. Copi is a heuristic analyzer, not a review
 - Fewer than 50 lines of code changed
 - Single file change with clear bounded scope
 - Docs-only PR
+- No meaningful behaviour change since the last run
 
 **Review phases — at most one Copi run per phase:**
 - **Initial** (optional) — on PR open, for large or complex PRs only (multiple files or several hundred LOC). Not a default. Use only when early feedback is expected to reduce iteration cost.
@@ -48,16 +49,20 @@ Clead decides when Copi reviews a PR. Copi is a heuristic analyzer, not a review
 
 **Label lifecycle (Adam's responsibility on Clead's instruction):**
 - Only add `ai-review` if it is not already present on the PR
-- Remove `ai-review` after the run completes
-- Never leave `ai-review` on a PR after a run
-- For a re-review: remove the label, confirm it is gone, then re-add
+- Only add `ai-review` if a new run is expected to produce meaningfully different input
+- Do not push changes while a Copi run is in progress — the run will be stale
+- A run is complete when the review comment is visible in the PR UI
+- The workflow removes the label automatically after every run, including failed runs
+- A PR must never have more than one active `ai-review` label instance
 
 To request Copi review, include in the verdict: "Adam, please add the `ai-review` label to PR #N."
 
-**Re-review and failure handling:**
+**Re-review rules:**
+- Re-review is permitted only after changes affecting program behaviour — logic, interfaces, or data flow
+- Formatting, comments, or non-functional changes do not justify re-review
 - Re-review is probabilistic, not guaranteed
-- If re-review fails, do not retry
-- If PR is ready to merge and no successful Copi run occurred in the current phase, do not attempt re-trigger — proceed with full-file Clead review instead
+- If re-review fails, do not retry — apply full-file Clead review instead
+- If PR is ready to merge and no successful Copi run occurred in the current phase, do not attempt re-trigger — proceed with full-file Clead review
 
 **When to request Copi review:**
 - Large or risky code changes spanning multiple source files
@@ -69,6 +74,7 @@ To request Copi review, include in the verdict: "Adam, please add the `ai-review
 - Docs/tooling-only PRs
 - Small targeted fixes (< 50 LOC, single file)
 - Iterative commits on a PR that already had a Copi pass at the same phase
+- No meaningful behaviour change since last run
 - When credits are exhausted
 
 ## Session Startup Checklist
