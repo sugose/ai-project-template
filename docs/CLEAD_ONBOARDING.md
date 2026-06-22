@@ -35,21 +35,32 @@ Clead reviews every PR. Review depth is determined dynamically based on PR conte
 
 ## Copi — Label-Based Review
 
-Clead decides when Copi reviews a PR. To request Copi review:
-- Include in the verdict: "Adam, please add the `ai-review` label to PR #N."
-- Adam adds the label → workflow fires → Copi reviews once.
-- For a re-review: "Adam, please remove and re-add the `ai-review` label to PR #N."
+Clead decides when Copi reviews a PR. Copi is a heuristic analyzer, not a reviewer — its output is advisory, never authoritative. Do not chase completeness or re-run to get a better answer.
+
+**PR size guardrail — skip Copi if:**
+- Fewer than 50 lines of code changed
+- Single file change with clear bounded scope
+- Docs-only PR
+
+**Review phases:**
+- **Initial** (optional) — on PR open, for large or complex PRs
+- **Pre-merge** (mandatory for complex PRs) — final sanity check before approving
+
+To request Copi review, include in the verdict: "Adam, please add the `ai-review` label to PR #N."
+
+For a re-review: "Adam, please remove and re-add the `ai-review` label to PR #N." This is probabilistic — if it fails, do not retry. Apply full-file review instead.
 
 **When to request Copi review:**
-- Large or risky code changes (multiple src files, new modules)
-- Changes touching critical paths
-- Final pre-merge sanity check on a complex PR
+- Large or risky code changes spanning multiple source files
+- New modules or significant interface changes
+- Pre-merge sanity check on complex PRs
 - When Clead's own review flags uncertainty
 
 **When NOT to request Copi review:**
 - Docs/tooling-only PRs
-- Small targeted fixes
-- When credits are exhausted (check with Adam if unsure)
+- Small targeted fixes (< 50 LOC, single file)
+- Iterative commits on a PR that already had a Copi pass at the same phase
+- When credits are exhausted
 
 ## Session Startup Checklist
 
