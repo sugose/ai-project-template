@@ -4,6 +4,8 @@ All notable changes to this template are documented here.
 
 ## [Unreleased]
 
+### Changed — tools/dump.sh: added binary file skip (`file --mime-encoding` guard) and truncation integrity check (TIMESTAMP token written after session start instructions and as final line; Clead verifies match before proceeding). Distributed to sugose/ai-project-template, sugose/titan-comptracker, sugose/python-blackjack, fomo-t/fomo-f.
+
 ### Fixed — TEAM_STRUCTURE.md Direction A PR flow: removed stale polling model and `copi_wait.sh` reference; added `?i=1` reporting convention to steps 3, 4, and 7
 
 ### Added — React Native / Expo language pack (`languages/react-native/`) — Expo SDK 54, TypeScript, jest-expo, Biome, GitHub Actions CI (lint + typecheck + unit tests); `.env` support for API keys; Android-first, Expo Go workflow
