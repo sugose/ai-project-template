@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "[PROJECT NAME]",
+    "slug": "[project-slug]",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "[project-slug]",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

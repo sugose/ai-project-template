@@ -13,7 +13,7 @@ Every language pack must contain exactly these files:
 | `vscode-settings.json` | VS Code settings for this language |
 | `vscode-extensions.json` | Recommended VS Code extensions |
 | `gitignore` | Language-specific `.gitignore` entries |
-| Language tooling files | e.g. `pyproject.toml` + `requirements.txt` for Python; `package.json` + `tsconfig.json` + `biome.json` for Node |
+| Language tooling files | e.g. `pyproject.toml` + `requirements.txt` for Python; `package.json` + `tsconfig.json` + `biome.json` for Node; `package.json` + `app.json` + `tsconfig.json` + `biome.json` for react-native |
 | `test_placeholder.*` | Single always-passing test — keeps CI green on day one; deleted when first real test is written |
 
 ## How to add a new language pack
@@ -34,6 +34,7 @@ Every language pack must contain exactly these files:
 |---|---|---|---|
 | `python/` | pytest + pytest-cov | Ruff | GitHub Actions (ubuntu-latest, Python 3.14.5) |
 | `node/` | Jest + ts-jest | Biome | GitHub Actions (ubuntu-latest, Node 22) |
+| `react-native/` | jest-expo + @testing-library/react-native | Biome | GitHub Actions (ubuntu-latest, Node 22, TypeScript check + unit tests only — no device build) |
 
 ## Notes
 
