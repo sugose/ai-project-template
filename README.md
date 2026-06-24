@@ -59,6 +59,7 @@ No single agent catches everything. The three-layer review catches most things. 
 |---|---|---|
 | Python 3.14.5 | pytest | Ruff |
 | Node/TypeScript 22 | Jest + ts-jest | Biome |
+| React Native / Expo SDK 54 | jest-expo + @testing-library/react-native | Biome |
 
 ---
 

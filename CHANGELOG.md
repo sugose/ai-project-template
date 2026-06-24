@@ -4,6 +4,8 @@ All notable changes to this template are documented here.
 
 ## [Unreleased]
 
+### Added — React Native / Expo language pack (`languages/react-native/`) — Expo SDK 54, TypeScript, jest-expo, Biome, GitHub Actions CI (lint + typecheck + unit tests); `.env` support for API keys; Android-first, Expo Go workflow
+
 ### Fixed — request-copilot-review.yml: added --repo flag to gh pr edit; runner has no git checkout so repo context must be explicit. Added || true to prevent failure when Copilot is already assigned
 
 

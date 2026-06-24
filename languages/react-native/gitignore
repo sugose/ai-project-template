@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+android/
+ios/
+dist/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+.env
+tools/dumps/*
+reviews/

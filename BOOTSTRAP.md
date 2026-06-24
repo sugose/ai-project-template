@@ -31,6 +31,7 @@ After receiving the answer, ask:
 **Question 2:** What programming language will this project use?
 - Python (3.14.5, pytest, Ruff)
 - Node/TypeScript (Node 22, Jest, Biome)
+- React Native / Expo (Expo SDK 54, TypeScript, jest-expo, Biome) — for Android and iOS apps
 
 After receiving the answer, store the language choice — every file you generate from this point will be tailored to that language. Then ask:
 
@@ -257,7 +258,13 @@ All notable changes to [PROJECT NAME] are documented here.
 
 7. **`.github/copilot-instructions.md`** — Copi onboarding. Adapt commands and standards for chosen language.
 
-After generating all seven documents, tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the START and END markers below and paste it into your Claude Code terminal session."
+After generating all seven documents, ask:
+
+**Question 2b (React Native projects only):** What is your API key? This will be written to a `.env` file at the project root. The file is gitignored and will never be committed to the repo.
+
+After receiving the answer, store it — it will be substituted into the `.env` file in the Crog setup prompt (replacing `[API_KEY]`). Skip this question for Python and Node/TypeScript projects.
+
+Then tell the user: "All project documents are ready. I will now produce a single Crog prompt that sets up the repo and writes all files to disk. Copy everything between the START and END markers below and paste it into your Claude Code terminal session."
 
 Note to Clead: when producing the consolidated Crog setup prompt, structure your output exactly like this — no conversational text between the signpost and the prompt block:
 
@@ -890,6 +897,107 @@ git push origin main
 npm ci
 npx biome ci .
 npx jest
+```
+
+Report back with the GitHub repo URL and test output.
+
+---
+
+**For React Native / Expo projects, produce this prompt instead:**
+
+---
+Crog — task: initialise [PROJECT NAME] repo
+
+**Step 1 — Create the GitHub repo and clone it:**
+```bash
+gh repo create [REPO PATH] --private --clone
+cd [REPO NAME]
+```
+
+**Step 2 — Scaffold the Expo project and write all project files:**
+```bash
+npx create-expo-app@latest [REPO NAME] --template default@sdk-54
+cd [REPO NAME]
+```
+
+Write `CLAUDE.md`:
+[full contents of generated CLAUDE.md]
+
+Write `docs/CROG_ONBOARDING.md`:
+[full contents of generated CROG_ONBOARDING.md]
+
+Write `docs/TEAM_STRUCTURE.md`:
+[full contents of generated TEAM_STRUCTURE.md]
+
+Write `docs/DEV_INFRASTRUCTURE.md`:
+[full contents of generated DEV_INFRASTRUCTURE.md]
+
+Write `docs/PRODUCT_BACKLOG.md`:
+[full contents of generated PRODUCT_BACKLOG.md]
+
+Write `CHANGELOG.md`:
+[full contents of generated CHANGELOG.md]
+
+Write `.github/copilot-instructions.md`:
+[full contents of generated copilot-instructions.md]
+
+Replace `package.json` with:
+[full contents of languages/react-native/package.json with placeholders substituted]
+
+Replace `tsconfig.json` with:
+[full contents of languages/react-native/tsconfig.json]
+
+Replace `biome.json` with:
+[full contents of languages/react-native/biome.json]
+
+Replace `app.json` with:
+[full contents of languages/react-native/app.json with placeholders substituted]
+
+Write `.github/workflows/ci.yml`:
+[full contents of languages/react-native/ci.yml]
+
+Write `.vscode/settings.json`:
+[full contents of languages/react-native/vscode-settings.json]
+
+Write `.vscode/extensions.json`:
+[full contents of languages/react-native/vscode-extensions.json]
+
+Replace `.gitignore` with:
+[full contents of languages/react-native/gitignore]
+
+Write `__tests__/placeholder.test.tsx`:
+[full contents of languages/react-native/placeholder.test.tsx]
+
+Write `.env`:
+```
+# Environment variables — never commit this file
+EXPO_PUBLIC_API_KEY=[API_KEY]
+EXPO_PUBLIC_API_BASE_URL=https://api.football-data.org/v4
+```
+
+Write `tools/dump.sh`:
+[verbatim contents of tools/dump.sh from template repo]
+
+Write `tools/pr_dump.sh`:
+[verbatim contents of tools/pr_dump.sh from template repo]
+
+Write `reviews/.gitkeep` — empty file.
+
+```bash
+chmod +x tools/dump.sh
+chmod +x tools/pr_dump.sh
+```
+
+**Step 3 — Install dependencies and commit:**
+```bash
+git add .
+git commit -m "Initial commit: [PROJECT NAME] project setup"
+git push origin main
+
+npm ci
+npx biome ci .
+npx tsc --noEmit
+npx jest --passWithNoTests
 ```
 
 Report back with the GitHub repo URL and test output.
