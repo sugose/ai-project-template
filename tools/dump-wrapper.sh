@@ -5,8 +5,7 @@
 # Paths are repo-relative (e.g. docs/TABLE_DISPLAY_SPEC.md).
 
 EXCLUDE_FILES=(
-  # docs/TABLE_DISPLAY_SPEC.md
-  # src/tests/test_session.py
+  docs/conference/presentation.html
 )
 
 # --- Do not edit below this line ---
