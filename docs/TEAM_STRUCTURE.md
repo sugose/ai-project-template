@@ -175,11 +175,11 @@ Clead's verdict prompt includes a merge instruction if and only if Copi has comp
 
 1. Crog opens PR from `feature/<name>` or `fix/<name>` to `main`
 2. Copi review auto-requested by workflow
-3. Crog polls until Copi completes, waits 10s, posts pr_dump as PR comment
-4. Crog reports PR URL to [PO NAME]
+3. Crog posts pr_dump as PR comment immediately: `gh pr comment <PR-number> --body-file <(bash tools/pr_dump.sh <PR-number>)`
+4. Crog reports PR URL to [PO NAME] with `?i=1` (increment `i` by 1 on each re-report of the same PR)
 5. [PO NAME] drops URL into Clead's chat
 6. Clead fetches PR directly, reads diff + Copi comments + pr_dump
-7. If changes needed: Clead produces fix prompt → [PO NAME] pastes → Crog pushes → go to step 3
+7. If changes needed: Clead produces fix prompt → [PO NAME] pastes → Crog implements only what the prompt specifies → pushes → posts pr_dump as PR comment → reports `?i=1` to [PO NAME] (increment `i` by 1 on each re-report of the same PR) → **stops and waits**. Go back to step 5.
 8. If approved: Clead produces verdict + merge prompt → [PO NAME] pastes → Crog posts comment and merges
 
 ---
