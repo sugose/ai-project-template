@@ -57,21 +57,14 @@ You and Clead run on the same underlying models but are **separate instances wit
   Copi review applies to code PRs only (`src/`). Docs/tooling PRs skip Copi entirely.
 
   **Code PRs** (any PR touching files under `src/`):
-  1. Open the PR
-  2. Copi review is requested automatically by the workflow on PR open (request manually via GitHub UI if it does not start).
-     Wait for Copi to complete its review before running `pr_dump.sh`.
-     If Copi has open comments requiring resolution, flag them to Clead —
-     do not merge until Copi has no open comments requiring resolution
-     and Clead has issued a merge instruction.
-  3. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
-  4. After Copi completes, wait 10 seconds for comments to settle, then post the full pr_dump output as a PR comment:
+  1. Open the PR (Copi auto-review may fire via ruleset — no action needed from Crog)
+  2. Post the full pr_dump output as a PR comment immediately:
      `gh pr comment <PR-number> --body-file <(bash tools/pr_dump.sh <PR-number>)`
-  5. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
-  6. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
-  7. **If Clead requests changes:** implement fixes and push to the same branch. Then:
-     a. Run `bash tools/copi_wait.sh <PR-number>` — this re-requests Copi review, reports detection status, and polls until complete.
-     b. Go back to step 4.
-  8. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
+  3. Report back to [PO NAME] with the PR URL appended with `?i=1` (increment `i` by 1 on each subsequent re-report of the same PR, e.g. `?i=2`, `?i=3`).
+  4. Stop and wait for Clead's instruction via [PO NAME].
+  5. [PO NAME] drops the URL into Clead's chat. Clead fetches and reviews.
+  6. **If Clead requests changes:** implement fixes and push to the same branch. Then go back to step 2.
+  7. **If Clead approves:** Clead produces a verdict comment + merge prompt. [PO NAME] pastes it. Post the verdict as a PR comment and merge.
 
   **Docs/tooling PRs** (only touching `docs/`, `tools/`, config files, `.github/`, root files):
   1. Open the PR
@@ -97,47 +90,6 @@ After posting the pr_dump and reporting back to [PO NAME], Crog must stop comple
 - **Do not push any fix** based on Copi's findings.
 - **Do not re-request Copi review** unless instructed by Clead.
 - **Wait** for [PO NAME] to paste a prompt from Clead. That prompt is the only authorised source of next actions.
-
-## Copi review flow
-
-### First invocation
-Copi is requested automatically via the GitHub ruleset ("Copilot review for default branch") on every PR open — src and non-src alike. No manual action needed. Run `bash tools/copi_wait.sh <PR-number>` and wait for completion before posting pr_dump.
-
-### Re-review (src PRs)
-After pushing a fix to a src PR, Copi re-review is triggered automatically via the `synchronize` workflow trigger — no manual action needed. Run `bash tools/copi_wait.sh <PR-number>` and wait for completion before posting pr_dump.
-
-If `copi_wait.sh` times out without detecting a review, Copi may still be running. Wait a few minutes and check the PR in the GitHub UI before concluding review failed.
-
-Note: manual "Re-request review" via the GitHub UI is no longer required for src re-reviews.
-
-**Hypothesis (unconfirmed):** If Copi auto-review fails to fire on a subsequent src push, pushing a trivial non-src change (e.g. a one-line docs update) between src pushes may unblock it. Observed once on python-blackjack PR #89 (i=2 docs push followed by i=3 src push that successfully auto-triggered Copi). Not yet confirmed as a reliable pattern — treat as a fallback to try before resorting to manual re-request.
-
-### Re-review (non-src PRs)
-Not expected by default. Only request re-review if Clead explicitly instructs it in the verdict prompt. If Clead does instruct it, tell Adam to manually invoke, then run `bash tools/copi_wait.sh <N>`.
-
-### Non-src PR review loop
-Copi steps out after initial review on non-src PRs (unless Clead instructs otherwise), but the Clead/Crog review loop continues until Clead approves. Copi stepping out does not end the loop.
-
-### No Copi credits
-If Copi credits are exhausted, skip `copi_wait.sh` entirely. Post pr_dump and report to Adam. State clearly in the PR report: "Copi credits exhausted — skipping Copi review, going straight to Clead." Resume normal Copi flow when credits are restored.
-
-### Every Copi wait
-Always state clearly what Adam needs to do before running `copi_wait.sh`:
-- First invocation: "No action needed — waiting for Copi to complete."
-- Re-review (src PRs): "No action needed — Copi re-review is triggered automatically. Running `bash tools/copi_wait.sh <N>`."
-
-### Changed file URLs in all PR reports
-Regardless of Copi status, every PR report to Adam must include the PR URL and a list of changed file URLs:
-
-```
-PR URL: https://github.com/<owner>/<repo>/pull/<N>?i=1
-
-Changed files:
-https://github.com/<owner>/<repo>/blob/<branch>/<file1>?pr=<N>&i=1
-https://github.com/<owner>/<repo>/blob/<branch>/<file2>?pr=<N>&i=1
-```
-
-`<branch>` is the head branch of the PR. Append `?pr=<N>&i=<iteration>` to every changed file URL to prevent caching. Increment `i` on each re-report of the same PR.
 
 ### Copi review
 
