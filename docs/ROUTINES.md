@@ -48,11 +48,7 @@ Full autonomy (Clead fires Crog directly) is the target once Anthropic adds secr
 Requests to a Routine use a single-line `curl` with the `-s` flag for clean output. The `anthropic-beta` header `experimental-cc-routine-2026-04-01` is required.
 
 ```bash
-curl -s https://api.anthropic.com/v1/routines/<ROUTINE_ID>/fire \
-  -H "Authorization: Bearer <TOKEN>" \
-  -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "<TASK_SPECIFICATION>"}'
+curl -s -X POST https://api.anthropic.com/v1/claude_code/routines/<ROUTINE_ID>/fire -H "Authorization: Bearer <TOKEN>" -H "anthropic-version: 2023-06-01" -H "anthropic-beta: experimental-cc-routine-2026-04-01" -H "Content-Type: application/json" -d "{\"text\": \"<TASK_SPECIFICATION>\"}"
 ```
 
 Replace `<ROUTINE_ID>`, `<TOKEN>`, and `<TASK_SPECIFICATION>` with real values. Never store the token anywhere other than your password manager.
