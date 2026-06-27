@@ -4,6 +4,8 @@ All notable changes to this template are documented here.
 
 ## [Unreleased]
 
+### Added — docs/V1_DELTA_V2.md: documents what changed between v1 and v2, why each item was discarded or kept, the new collaboration model, and the honest touchpoint count comparison
+
 ### Added — docs/decisions/0001-rebuild-workflow.md: ADR proposing rebuilt AI workflow; supersedes current scaffolding; documents WHAT/HOW collaboration model, repo-committed memory, GitHub-Actions-driven loop, reviewer independence constraint, and circuit breaker
 
 ### Changed — tools/dump.sh: added binary file skip (`file --mime-encoding` guard) and truncation integrity check (TIMESTAMP token written after session start instructions and as final line; Clead verifies match before proceeding). Distributed to sugose/ai-project-template, sugose/titan-comptracker, sugose/python-blackjack, fomo-t/fomo-f.
